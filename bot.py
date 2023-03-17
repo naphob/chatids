@@ -1,0 +1,83 @@
+import discord
+from discord.ext import commands
+from gtts import gTTS
+import asyncio
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
+COMMAND_PREFIX = '!'
+TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
+intents = discord.Intents.all()
+
+client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+
+@client.event
+async def on_ready():
+    print(f'{client.user.name} has connected to Discord!')
+    for guild in client.guilds:
+		# PRINT THE SERVER'S ID AND NAME.
+	    print(f"- {guild.id} (name: {guild.name})")
+
+@client.event
+async def on_voice_state_update(member, before, after):
+    if before.channel is None and after.channel is not None:
+        # A user joined a voice channel
+        message = f'{member.name} joined the voice channel.'
+        vc = await after.channel.connect()
+        sound = gTTS(text=message, lang="en", slow=False)
+        sound.save("join.mp3")
+        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
+        vc.play(tts_audio_file)
+        while vc.is_playing():  # Wait for the TTS audio to finish playing
+            await asyncio.sleep(1)
+        await vc.disconnect()
+
+    # notify user join voice channel to specific text channel
+    # text_channel = client.get_channel(TEXT_CHANNEL_ID)
+    # if text_channel is not None:
+    #     command = f'{COMMAND_PREFIX}join'
+    #     await text_channel.send(f'{member.name} joined voice channel {after.channel.mention}.')
+
+#command to join voice channel
+@client.command()
+async def summon(ctx):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+
+#command to leave voice channel
+@client.command()
+async def leave(ctx):
+    vc = ctx.voice_client
+    if not vc:
+        await ctx.send("I am not connected to a voice channel.")
+        return
+
+    await vc.disconnect()
+
+# Command to play the join sound in the user's current voice channel
+@client.command()
+async def speak(ctx):
+    user = ctx.message.author
+    if user.voice is not None:
+        try:
+            vc = await user.voice.channel.connect()
+        except:
+            vc = ctx.voice_client
+
+        sound = gTTS(text="This is a tts message", lang="en", slow=False)
+        sound.save("tts.mp3")
+
+        if vc.is_playing():
+            vc.stop()
+
+        source = discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+        vc.play(source)
+    else:
+        await ctx.send("You are not in a voice channel.")
+
+
+client.run(TOKEN)
+
+
