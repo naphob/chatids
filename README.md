@@ -1,2 +1,2 @@
 # chatids
-a discord bot that create voice notification when user join a voice channel
+a discord bot that creates voice notification when user join a voice channel
