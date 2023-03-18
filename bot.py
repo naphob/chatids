@@ -24,7 +24,7 @@ async def on_ready():
 async def on_voice_state_update(member, before, after):
     if before.channel is None and after.channel is not None:
         # A user joined a voice channel
-        message = f'{member.name} joined the voice channel.'
+        message = f'{member.nick} joined the voice channel.'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="en", slow=False)
         sound.save("join.mp3")
