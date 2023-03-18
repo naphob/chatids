@@ -40,14 +40,23 @@ async def on_voice_state_update(member, before, after):
     #     command = f'{COMMAND_PREFIX}join'
     #     await text_channel.send(f'{member.name} joined voice channel {after.channel.mention}.')
 
+#Log the errors
+@client.event
+async def on_error(event, *args, **kwargs):
+    with open('err.log', 'a') as f:
+        if event == 'on_voice_state_update':
+            f.write(f'Unhandled message: {args[0]}\n')
+        else:
+            raise
+
 #command to join voice channel
-@client.command()
+@client.command(name='summon', help='This command will make the bot join the voice channel')
 async def summon(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
 
 #command to leave voice channel
-@client.command()
+@client.command(name='leave', help='This command will make the bot leave the voice channel')
 async def leave(ctx):
     vc = ctx.voice_client
     if not vc:
@@ -57,7 +66,7 @@ async def leave(ctx):
     await vc.disconnect()
 
 # Command to play the join sound in the user's current voice channel
-@client.command()
+@client.command(name="speak", help="This command will make the bot speak example setence in the voice channel")
 async def speak(ctx):
     user = ctx.message.author
     if user.voice is not None:
