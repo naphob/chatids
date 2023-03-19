@@ -36,6 +36,20 @@ async def on_voice_state_update(member, before, after):
         while vc.is_playing():  # Wait for the TTS audio to finish playing
             await asyncio.sleep(1)
         await vc.disconnect()
+    elif after.channel:
+        # A user moved to voice channel
+        if member.nick is not None:
+            message = f'{member.nick} ย้านมาในห้องนี้แล้ว'
+        else:
+            message = f'{member.name} ย้านมาในห้องนี้แล้ว'
+        vc = await after.channel.connect()
+        sound = gTTS(text=message, lang="th", slow=False)
+        sound.save("join.mp3")
+        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
+        vc.play(tts_audio_file)
+        while vc.is_playing():  # Wait for the TTS audio to finish playing
+            await asyncio.sleep(1)
+        await vc.disconnect()
 
     # notify user join voice channel to specific text channel
     # text_channel = client.get_channel(TEXT_CHANNEL_ID)
