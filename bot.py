@@ -36,7 +36,7 @@ async def on_voice_state_update(member, before, after):
         while vc.is_playing():  # Wait for the TTS audio to finish playing
             await asyncio.sleep(1)
         await vc.disconnect()
-    elif after.channel:
+    elif after.channel and not before.self_mute and not after.self_mute:
         # A user moved to voice channel
         if member.nick is not None:
             message = f'{member.nick} ย้านมาในห้องนี้แล้ว'
