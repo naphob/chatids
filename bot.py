@@ -22,13 +22,9 @@ async def on_ready():
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    if member.nick is not None:
-        user = member.nick
-    else:
-        user = member.name
     if before.channel is None and after.channel is not None and not after.afk:
         # A user joined a voice channel
-        message = f'{user} เข้ามาในห้องแล้ว'
+        message = f'{member.display_name} เข้ามาในห้องแล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
@@ -39,7 +35,7 @@ async def on_voice_state_update(member, before, after):
         await vc.disconnect()
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
         # A user moved to voice channel
-        message = f'{user} ย้านมาในห้องนี้แล้ว'
+        message = f'{member.display_name} ย้านมาในห้องนี้แล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
@@ -50,7 +46,7 @@ async def on_voice_state_update(member, before, after):
         await vc.disconnect()
     elif after.channel and before.afk and not after.afk:
         # A user back from AFK to voice channel
-        message = f'{user} กลับมาจาก AFK แล้ว'
+        message = f'{member.display_name} กลับมาจาก AFK แล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
@@ -92,23 +88,25 @@ async def leave(ctx):
     await vc.disconnect()
 
 # Command to play the join sound in the user's current voice channel
-@client.command(name="speak", help="This command will make the bot speak example setence in the voice channel")
-async def speak(ctx):
+@client.command(name="speak", help="This command will make the bot speak what you want in the voice channel")
+async def speak(ctx, *args):
     user = ctx.message.author
+    text = f'{user.display_name} พูดว่า {args}'
     if user.voice is not None:
         try:
             vc = await user.voice.channel.connect()
         except:
             vc = ctx.voice_client
 
-        sound = gTTS(text="This is a tts message", lang="en", slow=False)
+        sound = gTTS(text=text, lang="th", slow=False)
         sound.save("tts.mp3")
 
-        if vc.is_playing():
-            vc.stop()
-
-        source = discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+        source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
         vc.play(source)
+
+        while vc.is_playing():  # Wait for the TTS audio to finish playing
+            await asyncio.sleep(1)
+        await vc.disconnect()
     else:
         await ctx.send("You are not in a voice channel.")
 
