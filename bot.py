@@ -1,9 +1,12 @@
-import discord
-from discord.ext import commands
-from gtts import gTTS
-import asyncio
-from dotenv import load_dotenv
 import os
+import discord
+import asyncio
+from gtts import gTTS
+from queue import Queue
+from dotenv import load_dotenv
+from discord.ext import commands
+from tempfile import TemporaryFile
+
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
@@ -12,6 +15,7 @@ TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+q = Queue()
 
 @client.event
 async def on_ready():
@@ -88,8 +92,8 @@ async def leave(ctx):
     await vc.disconnect()
 
 # Command to play the join sound in the user's current voice channel
-@client.command(name="speak", help="This command will make the bot speak what you want in the voice channel")
-async def speak(ctx, *args):
+@client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
+async def say(ctx, *args):
     user = ctx.message.author
     text = f'{user.display_name} พูดว่า {args}'
     if user.voice is not None:
@@ -98,15 +102,46 @@ async def speak(ctx, *args):
         except:
             vc = ctx.voice_client
 
-        sound = gTTS(text=text, lang="th", slow=False)
-        sound.save("tts.mp3")
+        try:
+            if not vc.is_playing() and q.empty():
+                q.put(text)
+                text = q.get()
+                print(f'{text} no queue')
+                sound = gTTS(text=text, lang="th", slow=False)
+                sound.save("tts.mp3")
 
-        source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
-        vc.play(source)
+                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+                vc.play(source)
+                while vc.is_playing():
+                    await asyncio.sleep(10)
+                await vc.disconnect()
+            else:
+                q.put(text)
+                while vc.is_playing():
+                    await asyncio.sleep(10)
+                text = q.get()
+                print(f'{text} in queue')
+                sound = gTTS(text=text, lang="th", slow=False)
+                sound.save("tts.mp3")
 
-        while vc.is_playing():  # Wait for the TTS audio to finish playing
-            await asyncio.sleep(1)
-        await vc.disconnect()
+                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+                vc.play(source)
+                if q.empty():
+                    while vc.is_playing():
+                        await asyncio.sleep(30)
+                    await vc.disconnect()
+
+        except(TypeError, AttributeError):
+            try:
+                print(text)
+                sound = gTTS(text=text, lang="th", slow=False)
+                sound.save("tts.mp3")
+
+                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+                vc.play(source)
+            except:
+                await ctx.send("I'm not in a voice channel and neither are you!")
+            return
     else:
         await ctx.send("You are not in a voice channel.")
 
