@@ -25,9 +25,10 @@ async def on_ready():
 
 @client.event
 async def on_voice_state_update(member, before, after):
+    username = member.display_name.split('[')
     if before.channel is None and after.channel is not None and not after.afk:
         # A user joined a voice channel
-        message = f'{member.display_name} เข้ามาในห้องแล้ว'
+        message = f'{username[0]} เข้ามาในห้องแล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
@@ -38,7 +39,7 @@ async def on_voice_state_update(member, before, after):
         await vc.disconnect()
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
         # A user moved to voice channel
-        message = f'{member.display_name} ย้านมาในห้องนี้แล้ว'
+        message = f'{username[0]} ย้านมาในห้องนี้แล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
@@ -49,7 +50,7 @@ async def on_voice_state_update(member, before, after):
         await vc.disconnect()
     elif after.channel and before.afk and not after.afk:
         # A user back from AFK to voice channel
-        message = f'{member.display_name} กลับมาจาก AFK แล้ว'
+        message = f'{username[0]} กลับมาจาก AFK แล้ว'
         vc = await after.channel.connect()
         sound = gTTS(text=message, lang="th", slow=False)
         sound.save("join.mp3")
