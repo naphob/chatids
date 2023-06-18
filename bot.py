@@ -128,28 +128,28 @@ async def send(ctx, member: discord.Member, msg):
     username = user.display_name.split('[')
     text = f'{username[0]} พูดว่า {msg}'
     q.put(text)
-    try:
-        vc = await member.voice.channel.connect()
-    except:
-        vc = ctx.voice_client
-    while not q.empty():
-        if not vc.is_playing():
-            text = q.get()
-            print(text)
-            sound = gTTS(text=text, lang="th", slow=False)
-            sound.save("tts.mp3")
+    if member.voice is not None:
+        try:
+            vc = await member.voice.channel.connect()
+        except:
+            vc = ctx.voice_client
+        while not q.empty():
+            if not vc.is_playing():
+                text = q.get()
+                print(text)
+                sound = gTTS(text=text, lang="th", slow=False)
+                sound.save("tts.mp3")
 
-            source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
-            vc.play(source)
-            while vc.is_playing():
+                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+                vc.play(source)
+                while vc.is_playing():
+                    await asyncio.sleep(10)
+            else:
                 await asyncio.sleep(10)
-        else:
+        if q.empty():
             await asyncio.sleep(10)
-    if q.empty():
-        await asyncio.sleep(10)
-        await vc.disconnect()
-
+            await vc.disconnect()
+    else:
+        await ctx.send("Receiver is not in a voice channel.")
 
 client.run(TOKEN)
-
-
