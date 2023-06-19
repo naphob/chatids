@@ -60,11 +60,6 @@ async def on_voice_state_update(member, before, after):
             await asyncio.sleep(1)
         await vc.disconnect()
 
-    # notify user join voice channel to specific text channel
-    # text_channel = client.get_channel(TEXT_CHANNEL_ID)
-    # if text_channel is not None:
-    #     command = f'{COMMAND_PREFIX}join'
-    #     await text_channel.send(f'{member.name} joined voice channel {after.channel.mention}.')
 
 #Log the errors
 @client.event
@@ -91,7 +86,7 @@ async def leave(ctx):
 
     await vc.disconnect()
 
-# Command to play the join sound in the user's current voice channel
+# Command to play voice messenge in the user's current voice channel
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
 async def say(ctx, *args):
     user = ctx.message.author
@@ -122,6 +117,7 @@ async def say(ctx, *args):
     else:
         await ctx.send("You are not in a voice channel.")
 
+# Command to send voice messenge to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentionied user connected to voice channel")
 async def send(ctx, member: discord.Member, msg):
     user = ctx.message.author
