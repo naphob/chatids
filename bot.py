@@ -104,7 +104,6 @@ async def say(ctx, *args):
                 print(text)
                 sound = gTTS(text=text, lang="th", slow=False)
                 sound.save("tts.mp3")
-
                 source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                 vc.play(source)
                 while vc.is_playing():
@@ -119,10 +118,10 @@ async def say(ctx, *args):
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentionied user connected to voice channel")
-async def send(ctx, member: discord.Member, msg):
+async def send(ctx, member: discord.Member, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
-    text = f'{username[0]} พูดว่า {msg}'
+    text = f'{username[0]} ฝากบอกว่า {args}'
     q.put(text)
     if member.voice is not None:
         try:
@@ -135,7 +134,6 @@ async def send(ctx, member: discord.Member, msg):
                 print(text)
                 sound = gTTS(text=text, lang="th", slow=False)
                 sound.save("tts.mp3")
-
                 source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                 vc.play(source)
                 while vc.is_playing():
