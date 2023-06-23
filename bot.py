@@ -92,8 +92,8 @@ async def say(ctx, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
     text = f'{username[0]} พูดว่า {args}'
-    q.put(text)
     if user.voice is not None:
+        q.put(text)
         try:
             vc = await user.voice.channel.connect()
         except:
@@ -122,8 +122,8 @@ async def send(ctx, member: discord.Member, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
     text = f'{username[0]} ฝากบอกว่า {args}'
-    q.put(text)
     if member.voice is not None:
+        q.put(text)
         try:
             vc = await member.voice.channel.connect()
         except:
