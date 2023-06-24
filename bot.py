@@ -14,6 +14,7 @@ TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+#create a queue for notification message
 q = Queue()
 
 @client.event
@@ -93,6 +94,7 @@ async def say(ctx, *args):
     username = user.display_name.split('[')
     text = f'{username[0]} พูดว่า {args}'
     if user.voice is not None:
+        # put new notification to queue
         q.put(text)
         try:
             vc = await user.voice.channel.connect()
@@ -117,7 +119,7 @@ async def say(ctx, *args):
         await ctx.send("You are not in a voice channel.")
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
-@client.command(name="send", help="This command will send voice message to mentionied user connected to voice channel")
+@client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
 async def send(ctx, member: discord.Member, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
