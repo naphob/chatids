@@ -13,7 +13,7 @@ COMMAND_PREFIX = '!'
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
-#create a queue for notification message
+#create a queue for tts message
 q = Queue()
 
 async def noti(username, channel, message):
@@ -27,19 +27,19 @@ async def noti(username, channel, message):
         await asyncio.sleep(1)
     await vc.disconnect()
 
-async def tts_vc(ctx, user, text, err_msg):
+async def tts_vc(ctx, user, message, err_msg):
     if user.voice is not None:
         # put new notification to queue
-        q.put(text)
+        q.put(message)
         try:
             vc = await user.voice.channel.connect()
         except:
             vc = ctx.voice_client
         while not q.empty():
             if not vc.is_playing():
-                tts_text = q.get()
-                print(tts_text)
-                sound = gTTS(text=tts_text, lang="th", slow=False)
+                tts_message = q.get()
+                print(tts_message)
+                sound = gTTS(text=tts_message, lang="th", slow=False)
                 sound.save("tts.mp3")
                 source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                 vc.play(source)
@@ -106,17 +106,17 @@ async def leave(ctx):
 async def say(ctx, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
-    text = f'{username[0]} พูดว่า {args}'
+    message = f'{username[0]} พูดว่า {args}'
     err_msg = 'You are not in a voice channel.'
-    await tts_vc(ctx, user, text, err_msg)
+    await tts_vc(ctx, user, message, err_msg)
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
 async def send(ctx, member: discord.Member, *args):
     user = ctx.message.author
     username = user.display_name.split('[')
-    text = f'{username[0]} ฝากบอกว่า {args}'
+    message = f'{username[0]} ฝากบอกว่า {args}'
     err_msg = 'Receiver is not in a voice channel.'
-    await tts_vc(ctx, user, text, err_msg)
+    await tts_vc(ctx, user, message, err_msg)
 
 client.run(TOKEN)
