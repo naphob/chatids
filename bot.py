@@ -10,7 +10,6 @@ from discord.ext import commands
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 COMMAND_PREFIX = '!'
-TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
 intents = discord.Intents.all()
 
 client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
