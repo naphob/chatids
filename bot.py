@@ -28,6 +28,32 @@ async def noti(username, channel, message):
         await asyncio.sleep(1)
     await vc.disconnect()
 
+async def tts_vc(ctx, user, text, err_msg):
+    if user.voice is not None:
+        # put new notification to queue
+        q.put(text)
+        try:
+            vc = await user.voice.channel.connect()
+        except:
+            vc = ctx.voice_client
+        while not q.empty():
+            if not vc.is_playing():
+                tts_text = q.get()
+                print(tts_text)
+                sound = gTTS(text=tts_text, lang="th", slow=False)
+                sound.save("tts.mp3")
+                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
+                vc.play(source)
+                while vc.is_playing():
+                    await asyncio.sleep(10)
+            else:
+                await asyncio.sleep(10)
+        if q.empty():
+            await asyncio.sleep(10)
+            await vc.disconnect()
+    else:
+        await ctx.send(err_msg)
+
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
@@ -43,7 +69,7 @@ async def on_voice_state_update(member, before, after):
         message = 'เข้ามาในห้องแล้ว'
         await noti(username, after, message)
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
-        # A user moved to voice channel
+        # A user moved to another voice channel
         message = 'ย้านมาในห้องนี้แล้ว'
         await noti(username, after, message)
     elif after.channel and before.afk and not after.afk:
@@ -75,32 +101,6 @@ async def leave(ctx):
         return
 
     await vc.disconnect()
-
-async def tts_vc(ctx, user, text, err_msg):
-    if user.voice is not None:
-        # put new notification to queue
-        q.put(text)
-        try:
-            vc = await user.voice.channel.connect()
-        except:
-            vc = ctx.voice_client
-        while not q.empty():
-            if not vc.is_playing():
-                tts_text = q.get()
-                print(tts_text)
-                sound = gTTS(text=tts_text, lang="th", slow=False)
-                sound.save("tts.mp3")
-                source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
-                vc.play(source)
-                while vc.is_playing():
-                    await asyncio.sleep(10)
-            else:
-                await asyncio.sleep(10)
-        if q.empty():
-            await asyncio.sleep(10)
-            await vc.disconnect()
-    else:
-        await ctx.send(err_msg)
 
 # Command to play voice message in the user's current voice channel
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
