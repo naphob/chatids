@@ -17,6 +17,17 @@ client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
 #create a queue for notification message
 q = Queue()
 
+async def noti(username, channel, message):
+    tts_message = f'{username[0]} {message}'
+    vc = await channel.channel.connect()
+    sound = gTTS(text=tts_message, lang="th", slow=False)
+    sound.save("join.mp3")
+    tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
+    vc.play(tts_audio_file)
+    while vc.is_playing():  # Wait for the TTS audio to finish playing
+        await asyncio.sleep(1)
+    await vc.disconnect()
+
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
@@ -29,38 +40,16 @@ async def on_voice_state_update(member, before, after):
     username = member.display_name.split('[')
     if before.channel is None and after.channel is not None and not after.afk:
         # A user joined a voice channel
-        message = f'{username[0]} เข้ามาในห้องแล้ว'
-        vc = await after.channel.connect()
-        sound = gTTS(text=message, lang="th", slow=False)
-        sound.save("join.mp3")
-        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
-        vc.play(tts_audio_file)
-        while vc.is_playing():  # Wait for the TTS audio to finish playing
-            await asyncio.sleep(1)
-        await vc.disconnect()
+        message = 'เข้ามาในห้องแล้ว'
+        await noti(username, after, message)
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
         # A user moved to voice channel
-        message = f'{username[0]} ย้านมาในห้องนี้แล้ว'
-        vc = await after.channel.connect()
-        sound = gTTS(text=message, lang="th", slow=False)
-        sound.save("join.mp3")
-        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
-        vc.play(tts_audio_file)
-        while vc.is_playing():  # Wait for the TTS audio to finish playing
-            await asyncio.sleep(1)
-        await vc.disconnect()
+        message = 'ย้านมาในห้องนี้แล้ว'
+        await noti(username, after, message)
     elif after.channel and before.afk and not after.afk:
-        # A user back from AFK to voice channel
-        message = f'{username[0]} กลับมาจาก AFK แล้ว'
-        vc = await after.channel.connect()
-        sound = gTTS(text=message, lang="th", slow=False)
-        sound.save("join.mp3")
-        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
-        vc.play(tts_audio_file)
-        while vc.is_playing():  # Wait for the TTS audio to finish playing
-            await asyncio.sleep(1)
-        await vc.disconnect()
-
+        # A user's back from AFK to voice channel
+        message = 'กลับมาจาก AFK แล้ว'
+        await noti(username, after, message)
 
 #Log the errors
 @client.event
