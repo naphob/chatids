@@ -27,12 +27,12 @@ async def noti(username, channel, message):
         await asyncio.sleep(1)
     await vc.disconnect()
 
-async def tts_vc(ctx, user, target, message, err_msg):
+async def tts_vc(ctx, user, message, err_msg):
     if user.voice is not None:
         # put new tts message to queue
         q.put(message)
         try:
-            vc = await target.voice.channel.connect()
+            vc = await user.voice.channel.connect()
         except:
             vc = ctx.voice_client
         while not q.empty():
@@ -108,7 +108,7 @@ async def say(ctx, *args):
     username = user.display_name.split('[')
     message = f'{username[0]} พูดว่า {args}'
     err_msg = 'You are not in a voice channel.'
-    await tts_vc(ctx, user, user, message, err_msg)
+    await tts_vc(ctx, user, message, err_msg)
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
@@ -117,6 +117,6 @@ async def send(ctx, member: discord.Member, *args):
     username = user.display_name.split('[')
     message = f'{username[0]} ฝากบอกว่า {args}'
     err_msg = 'Receiver is not in a voice channel.'
-    await tts_vc(ctx, user, member, message, err_msg)
+    await tts_vc(ctx, member, message, err_msg)
 
 client.run(TOKEN)
