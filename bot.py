@@ -29,7 +29,7 @@ async def noti(username, channel, message):
 
 async def tts_vc(ctx, user, message, err_msg):
     if user.voice is not None:
-        # put new notification to queue
+        # put new tts message to queue
         q.put(message)
         try:
             vc = await user.voice.channel.connect()
