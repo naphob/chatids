@@ -9,6 +9,7 @@ from discord.ext import commands
 
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
+connections = {}
 COMMAND_PREFIX = '!'
 intents = discord.Intents.all()
 
