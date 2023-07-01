@@ -5,6 +5,7 @@ from gtts import gTTS
 from queue import Queue
 from dotenv import load_dotenv
 from discord.ext import commands
+import speech_recognition as sr
 
 
 load_dotenv()
@@ -119,5 +120,56 @@ async def send(ctx, member: discord.Member, *args):
     message = f'{username[0]} ฝากบอกว่า {args}'
     err_msg = 'Receiver is not in a voice channel.'
     await tts_vc(ctx, member, message, err_msg)
+
+
+@client.command()
+async def rec(ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
+    voice = ctx.author.voice
+
+    if not voice:
+        await ctx.respond("You aren't in a voice channel!")
+
+    vc = await voice.channel.connect()  # Connect to the voice channel the author is in.
+    connections.update({ctx.guild.id: vc})  # Updating the cache with the guild and channel.
+
+    vc.start_recording(
+        discord.sinks.MP3Sink(),  # The sink type to use.
+        once_done,  # What to do once done.
+        user,  # The channel to disconnect from.
+        ctx.author
+    )
+
+async def once_done(sink: discord.sinks, member: discord.Member, user: discord.User, *args):  # Our voice client already passes these in.
+    recorded_users = [  # A list of recorded users
+        f"<@{user_id}>"
+        for user_id, audio in sink.audio_data.items()
+    ]
+    await sink.vc.disconnect()  # Disconnect from the voice channel.
+    files = [discord.File(audio.file, f"{user_id}.{sink.encoding}") for user_id, audio in sink.audio_data.items()]  # List down the files.
+    for user_id, audio in sink.audio_data.items():
+        if user_id == user.id:
+            with open("output.mp3", "wb") as f:
+                f.write(audio.file.getbuffer())
+    vc = await member.voice.channel.connect()
+    playback_voice = await discord.FFmpegOpusAudio.from_probe('output.mp3', method="fallback")
+
+    vc.play(playback_voice)
+    while vc.is_playing():
+        await asyncio.sleep(10)
+    await vc.disconnect()
+    # r = sr.Recognizer()
+    # output = sr.AudioFile(files)
+    # with output as source:
+    #     audio = r.record(source)
+    # print("You said " + r.recognize_google(audio,language = "th-TH"))
+    # await channel.send(files=files)
+    # await channel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
+
+@client.command()
+async def stop(ctx):
+    if ctx.guild.id in connections:  # Check if the guild is in the cache.
+        vc = connections[ctx.guild.id]
+        vc.stop_recording()  # Stop recording, and call the callback (once_done).
+        del connections[ctx.guild.id]  # Remove the guild from the cache.
 
 client.run(TOKEN)
