@@ -58,6 +58,7 @@ async def tts_vc(ctx, user, message, err_msg):
 @client.event
 async def on_ready():
     print(f'{client.user.name} has connected to Discord!')
+    await client.change_presence(activity=discord.Game(name="Star Citizen"))
     for guild in client.guilds:
 		# PRINT THE SERVER'S ID AND NAME.
 	    print(f"- {guild.id} (name: {guild.name})")
@@ -157,13 +158,6 @@ async def once_done(sink: discord.sinks, member: discord.Member, user: discord.U
     while vc.is_playing():
         await asyncio.sleep(10)
     await vc.disconnect()
-    # r = sr.Recognizer()
-    # output = sr.AudioFile(files)
-    # with output as source:
-    #     audio = r.record(source)
-    # print("You said " + r.recognize_google(audio,language = "th-TH"))
-    # await channel.send(files=files)
-    # await channel.send(f"finished recording audio for: {', '.join(recorded_users)}.", files=files)  # Send a message with the accumulated files.
 
 @client.command()
 async def stop(ctx):
