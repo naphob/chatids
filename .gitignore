@@ -1,4 +1,4 @@
 .env
 *.mp3
 err.log
-.json
+*.json
