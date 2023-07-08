@@ -1,20 +1,34 @@
 import os
+import random
 import discord
 import asyncio
 from gtts import gTTS
 from queue import Queue
 from dotenv import load_dotenv
 from discord.ext import commands
-import speech_recognition as sr
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
 
 
 load_dotenv()
+credential = os.getenv("FIREBASE_CREDENTIALS")
+cred = credentials.Certificate(credential)
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://ids-bot-9ac6a-default-rtdb.asia-southeast1.firebasedatabase.app/'
+})
+
+ref = db.reference('users')
+users_ref = ref.child('users')
 TOKEN = os.getenv("TOKEN")
+TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
+counter = 0
 connections = {}
 COMMAND_PREFIX = '!'
 intents = discord.Intents.all()
 
-client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents)
+client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, descriptioin="IDS's discord bot assistant")
+
 #create a queue for tts message
 q = Queue()
 
@@ -50,7 +64,7 @@ async def tts_vc(ctx, user, message, err_msg):
             else:
                 await asyncio.sleep(10)
         if q.empty():
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             await vc.disconnect()
     else:
         await ctx.send(err_msg)
@@ -61,7 +75,23 @@ async def on_ready():
     await client.change_presence(activity=discord.Game(name="Star Citizen"))
     for guild in client.guilds:
 		# PRINT THE SERVER'S ID AND NAME.
-	    print(f"- {guild.id} (name: {guild.name})")
+	    print(f"- {guild.id} | {guild.name}")
+
+@client.event
+async def on_message(message):
+    user = message.author
+    channel = await client.fetch_channel(TEXT_CHANNEL_ID)
+    if user.id != client.user.id and message.content not in "!balance":
+        coin = random.random()
+        await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
+        print(f"{user.name} recieved {coin} IDS Coins.")
+        user_coin = users_ref.child(f"{user.id}").child('coin').get()
+        if user_coin:
+            coin += user_coin
+        users_ref.child(f"{user.id}").set({
+        'coin' : coin
+        })
+    await client.process_commands(message)
 
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -104,6 +134,15 @@ async def leave(ctx):
 
     await vc.disconnect()
 
+@client.command(name="balance", help="This command will return coins balance")
+async def balance(ctx):
+    user = ctx.author
+    coin = users_ref.child(f"{user.id}").child('coin').get()
+    await ctx.send(f"<@{user.id}>'s balance: {coin} IDS Coins.")
+    print(f"{user.name}'s balance: {coin} IDS Coins.")
+    # else:
+    #     await ctx.send("You have no IDS coins")
+
 # Command to play voice message in the user's current voice channel
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
 async def say(ctx, *args):
@@ -121,7 +160,6 @@ async def send(ctx, member: discord.Member, *args):
     message = f'{username[0]} ฝากบอกว่า {args}'
     err_msg = 'Receiver is not in a voice channel.'
     await tts_vc(ctx, member, message, err_msg)
-
 
 @client.command()
 async def rec(ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
