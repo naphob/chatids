@@ -138,10 +138,11 @@ async def leave(ctx):
 async def balance(ctx):
     user = ctx.author
     coin = users_ref.child(f"{user.id}").child('coin').get()
-    await ctx.send(f"<@{user.id}>'s balance: {coin} IDS Coins.")
-    print(f"{user.name}'s balance: {coin} IDS Coins.")
-    # else:
-    #     await ctx.send("You have no IDS coins")
+    if coin:
+        await ctx.send(f"<@{user.id}>'s balance: {coin} IDS Coins.")
+        print(f"{user.name}'s balance: {coin} IDS Coins.")
+    else:
+        await ctx.send("You have no IDS coins")
 
 # Command to play voice message in the user's current voice channel
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
