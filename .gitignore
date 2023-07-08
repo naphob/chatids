@@ -1,4 +1,4 @@
 .env
 *.mp3
 err.log
-.firebase
+.json
