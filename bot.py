@@ -83,7 +83,7 @@ async def add_coin(user):
     coin = random.random()
     if user.id != client.user.id:
         await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
-        print(f"{user.name} recieved {coin} IDS Coins.")
+        print(f"{user.display_name} recieved {coin} IDS Coins.")
         user_coin = users_ref.child(f"{user.id}").child('coin').get()
         if user_coin:
             coin += user_coin
@@ -91,20 +91,13 @@ async def add_coin(user):
         'coin' : coin
         })
 
+command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
+
 @client.event
 async def on_message(message):
     user = message.author
     # channel = await client.fetch_channel(TEXT_CHANNEL_ID)
-    if user.id != client.user.id and message.content not in "!balance":
-        # coin = random.random()
-        # await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
-        # print(f"{user.name} recieved {coin} IDS Coins.")
-        # user_coin = users_ref.child(f"{user.id}").child('coin').get()
-        # if user_coin:
-        #     coin += user_coin
-        # users_ref.child(f"{user.id}").set({
-        # 'coin' : coin
-        # })
+    if user.id != client.user.id and message.content not in command:
         await add_coin(user)
     await client.process_commands(message)
 
@@ -156,9 +149,32 @@ async def balance(ctx):
     coin = users_ref.child(f"{user.id}").child('coin').get()
     if coin:
         await ctx.send(f"<@{user.id}>'s balance: {coin} IDS Coins.")
-        print(f"{user.name}'s balance: {coin} IDS Coins.")
+        print(f"{user.display_name}'s balance: {coin} IDS Coins.")
     else:
         await ctx.send("You have no IDS coins")
+
+@client.command(name="give", help="This command will return coins balance")
+async def give(ctx, user: discord.Member, amount: float):
+    sender = ctx.author
+    receiver = user
+    sender_coin = users_ref.child(f"{sender.id}").child('coin').get()
+    receiver_coin = users_ref.child(f"{receiver.id}").child('coin').get()
+    if sender_coin >= amount:
+        remaining_coin = sender_coin - amount
+        if receiver_coin:
+            received_coin = receiver_coin + amount
+        else:
+            received_coin = amount
+        users_ref.child(f"{sender.id}").set({
+        'coin' : remaining_coin
+        })
+        users_ref.child(f"{receiver.id}").set({
+        'coin' : received_coin
+        })
+        await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
+        print(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
+    else:
+        await ctx.send("Insufficient IDS coin balance")
 
 # Command to play voice message in the user's current voice channel
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
