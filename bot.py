@@ -35,6 +35,7 @@ q = Queue()
 async def noti(username, channel, message):
     tts_message = f'{username[0]} {message}'
     vc = await channel.channel.connect()
+    print(tts_message)
     sound = gTTS(text=tts_message, lang="th", slow=False)
     sound.save("join.mp3")
     tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
@@ -77,12 +78,10 @@ async def on_ready():
 		# PRINT THE SERVER'S ID AND NAME.
 	    print(f"- {guild.id} | {guild.name}")
 
-@client.event
-async def on_message(message):
-    user = message.author
+async def add_coin(user):
     channel = await client.fetch_channel(TEXT_CHANNEL_ID)
-    if user.id != client.user.id and message.content not in "!balance":
-        coin = random.random()
+    coin = random.random()
+    if user.id != client.user.id:
         await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
         print(f"{user.name} recieved {coin} IDS Coins.")
         user_coin = users_ref.child(f"{user.id}").child('coin').get()
@@ -91,6 +90,22 @@ async def on_message(message):
         users_ref.child(f"{user.id}").set({
         'coin' : coin
         })
+
+@client.event
+async def on_message(message):
+    user = message.author
+    # channel = await client.fetch_channel(TEXT_CHANNEL_ID)
+    if user.id != client.user.id and message.content not in "!balance":
+        # coin = random.random()
+        # await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
+        # print(f"{user.name} recieved {coin} IDS Coins.")
+        # user_coin = users_ref.child(f"{user.id}").child('coin').get()
+        # if user_coin:
+        #     coin += user_coin
+        # users_ref.child(f"{user.id}").set({
+        # 'coin' : coin
+        # })
+        await add_coin(user)
     await client.process_commands(message)
 
 @client.event
@@ -99,6 +114,7 @@ async def on_voice_state_update(member, before, after):
     if before.channel is None and after.channel is not None and not after.afk:
         # A user joined a voice channel
         message = 'เข้ามาในห้องแล้ว'
+        await add_coin(member)
         await noti(username, after, message)
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
         # A user moved to another voice channel
