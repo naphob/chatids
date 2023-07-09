@@ -78,12 +78,12 @@ async def on_ready():
 		# PRINT THE SERVER'S ID AND NAME.
 	    print(f"- {guild.id} | {guild.name}")
 
-async def add_coin(user):
+async def add_coin(user,source):
     channel = await client.fetch_channel(TEXT_CHANNEL_ID)
     coin = random.random()
-    if user.id != client.user.id:
-        await channel.send(f"<@{user.id}> recieved {coin} IDS Coins.")
-        print(f"{user.display_name} recieved {coin} IDS Coins.")
+    if not user.bot:
+        await channel.send(f"<@{user.id}> recieved {coin} IDS Coins from {source}.")
+        print(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
         user_coin = users_ref.child(f"{user.id}").child('coin').get()
         if user_coin:
             coin += user_coin
@@ -96,10 +96,18 @@ command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!
 @client.event
 async def on_message(message):
     user = message.author
-    # channel = await client.fetch_channel(TEXT_CHANNEL_ID)
     if user.id != client.user.id and message.content not in command:
-        await add_coin(user)
+        await add_coin(user, "new message")
     await client.process_commands(message)
+
+@client.event
+async def on_raw_reaction_add(payload):
+    user = await client.fetch_user(payload.user_id)
+    await add_coin(user, "reaction")
+
+@client.event
+async def on_member_join(member):
+    await add_coin(member, "new member")
 
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -107,7 +115,7 @@ async def on_voice_state_update(member, before, after):
     if before.channel is None and after.channel is not None and not after.afk:
         # A user joined a voice channel
         message = 'เข้ามาในห้องแล้ว'
-        await add_coin(member)
+        await add_coin(member, "join vc")
         await noti(username, after, message)
     elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
         # A user moved to another voice channel
