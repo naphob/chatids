@@ -90,12 +90,12 @@ async def add_coin(user,source):
         'coin' : coin
         })
 
-command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
+bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
 
 @client.event
 async def on_message(message):
     user = message.author
-    if user.id != client.user.id and message.content not in command:
+    if user.id != client.user.id and message.content not in bot_command:
         await add_coin(user, "new message")
     await client.process_commands(message)
 
@@ -176,6 +176,7 @@ async def balance(ctx):
 
 @client.command(name="give", help="This command will return coins balance")
 async def give(ctx, user: discord.Member, amount: float):
+    channel = await client.fetch_channel(TEXT_CHANNEL_ID)
     sender = ctx.author
     receiver = user
     sender_coin = ref.child(f"{sender.id}").child('coin').get()
@@ -193,6 +194,7 @@ async def give(ctx, user: discord.Member, amount: float):
         'coin' : received_coin
         })
         await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
+        await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
         print(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
     else:
         await ctx.send("Insufficient IDS coin balance")
