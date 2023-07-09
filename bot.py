@@ -19,7 +19,6 @@ firebase_admin.initialize_app(cred, {
 })
 
 ref = db.reference('users')
-users_ref = ref.child('users')
 TOKEN = os.getenv("TOKEN")
 TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
 counter = 0
@@ -84,10 +83,10 @@ async def add_coin(user,source):
     if not user.bot:
         await channel.send(f"<@{user.id}> recieved {coin} IDS Coins from {source}.")
         print(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
-        user_coin = users_ref.child(f"{user.id}").child('coin').get()
+        user_coin = ref.child(f"{user.id}").child('coin').get()
         if user_coin:
             coin += user_coin
-        users_ref.child(f"{user.id}").set({
+        ref.child(f"{user.id}").set({
         'coin' : coin
         })
 
@@ -126,24 +125,31 @@ async def on_voice_state_update(member, before, after):
         message = 'กลับมาจาก AFK แล้ว'
         await noti(username, after, message)
 
-#Log the errors
 @client.event
 async def on_error(event, *args, **kwargs):
+    """
+    Log the errors
+    """
     with open('err.log', 'a') as f:
         if event == 'on_voice_state_update':
             f.write(f'Unhandled message: {args[0]}\n')
         else:
             raise
 
-#command to join voice channel
+
 @client.command(name='summon', help='This command will make the bot join the voice channel')
 async def summon(ctx):
+    """
+    command to join voice channel
+    """
     channel = ctx.author.voice.channel
     await channel.connect()
 
-#command to leave voice channel
 @client.command(name='leave', help='This command will make the bot leave the voice channel')
 async def leave(ctx):
+    """
+    command to leave voice channel
+    """
     vc = ctx.voice_client
     if not vc:
         await ctx.send("I am not connected to a voice channel.")
@@ -154,10 +160,17 @@ async def leave(ctx):
 @client.command(name="balance", help="This command will return coins balance")
 async def balance(ctx):
     user = ctx.author
-    coin = users_ref.child(f"{user.id}").child('coin').get()
+    coin = ref.child(f"{user.id}").child('coin').get()
+    embed = discord.Embed(
+        color=discord.Color.dark_purple(),
+        description= f"Balance: {coin}",
+        title= f"{user.display_name}'s Wallet"
+    )
+    embed.set_author(name="Bank of IDS")
+    embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
     if coin:
-        await ctx.send(f"<@{user.id}>'s balance: {coin} IDS Coins.")
-        print(f"{user.display_name}'s balance: {coin} IDS Coins.")
+        await ctx.send(embed=embed)
+        print(f"{user.id}'s balance: {coin} IDS Coins.")
     else:
         await ctx.send("You have no IDS coins")
 
@@ -165,18 +178,18 @@ async def balance(ctx):
 async def give(ctx, user: discord.Member, amount: float):
     sender = ctx.author
     receiver = user
-    sender_coin = users_ref.child(f"{sender.id}").child('coin').get()
-    receiver_coin = users_ref.child(f"{receiver.id}").child('coin').get()
+    sender_coin = ref.child(f"{sender.id}").child('coin').get()
+    receiver_coin = ref.child(f"{receiver.id}").child('coin').get()
     if sender_coin >= amount:
         remaining_coin = sender_coin - amount
         if receiver_coin:
             received_coin = receiver_coin + amount
         else:
             received_coin = amount
-        users_ref.child(f"{sender.id}").set({
+        ref.child(f"{sender.id}").set({
         'coin' : remaining_coin
         })
-        users_ref.child(f"{receiver.id}").set({
+        ref.child(f"{receiver.id}").set({
         'coin' : received_coin
         })
         await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
@@ -184,9 +197,31 @@ async def give(ctx, user: discord.Member, amount: float):
     else:
         await ctx.send("Insufficient IDS coin balance")
 
-# Command to play voice message in the user's current voice channel
+@client.command(name="rank", help="This command show richest users ranking")
+async def rank(ctx):
+    result = ref.order_by_child('coin').limit_to_last(10).get()
+    ranks = list(result.items())
+    ranks.reverse()
+    leaderboard = {}
+    for key, val in ranks:
+        leaderboard[key] = val['coin']
+
+    embed = discord.Embed(
+        color=discord.Color.dark_purple(),
+        description= "The Richest Leaderboard",
+        title= "Bank of IDS"
+    )
+    names = ''
+    for rank, user in enumerate(leaderboard):
+        names += f"{rank+1}. <@{user}> : {leaderboard[user]} :coin:\n"
+    embed.add_field(name="Names", value=names, inline=False)
+    await ctx.send(embed=embed)
+
 @client.command(name="say", help="This command will make the bot speak what you want in the voice channel")
 async def say(ctx, *args):
+    """
+    Command to play voice message in the user's current voice channel
+    """
     user = ctx.message.author
     username = user.display_name.split('[')
     message = f'{username[0]} พูดว่า {args}'
