@@ -193,7 +193,19 @@ async def give(ctx, user: discord.Member, amount: float):
         ref.child(f"{receiver.id}").set({
         'coin' : received_coin
         })
-        await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
+
+        embed = discord.Embed(
+        color=discord.Color.dark_purple(),
+        title= f"Bank of IDS",
+        description= f"IDS Coin Transfer Transaction"
+        )
+
+        embed.add_field(name=sender.display_name, value=sender_coin, inline=True)
+        embed.add_field(name="Fee", value=0, inline=True)
+        embed.add_field(name=receiver.display_name, value=amount, inline=True)
+
+        # await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
+        await ctx.send(embed=embed)
         await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
         print(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
     else:
