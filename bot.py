@@ -262,14 +262,19 @@ async def say(ctx, *args):
 @client.command(name="welcome", help="Welcome new member")
 async def welcome(ctx):
     avatar = ctx.author.avatar
+    count = ctx.guild.member_count
     username = ctx.author.name
     W , H = (1100, 500)
     text = f"Welcome {username} to IDS"
+    member_text = f"Member #{count}"
     img =Image.open("Asset/ids_bg.png")
     draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("arial.ttf", 60)
+    font = ImageFont.truetype("arial.ttf", 50)
+    count_font = ImageFont.truetype("arial.ttf", 32)
     text_size =draw.textlength(text, font=font)
-    draw.text(((W-text_size)/ 2, 320), text, fill=(255, 255, 255, 255), font=font, aligh="center")
+    count_size =draw.textlength(member_text, font=count_font)
+    draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
+    draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
     img.save("text.png")
 
     await ctx.send(file= discord.File("text.png"))
