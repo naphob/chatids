@@ -1,4 +1,5 @@
 import os
+from rich.console import Console
 import random
 import discord
 import asyncio
@@ -9,8 +10,9 @@ from discord.ext import commands
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
+from PIL import Image, ImageFont, ImageDraw
 
-
+console = Console()
 load_dotenv()
 credential = os.getenv("FIREBASE_CREDENTIALS")
 cred = credentials.Certificate(credential)
@@ -31,16 +33,17 @@ client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, descriptio
 #create a queue for tts message
 q = Queue()
 
-async def noti(username, channel, message):
+async def noti(member, channel, message):
+    username = member.display_name.split('[')
     tts_message = f'{username[0]} {message}'
     vc = await channel.channel.connect()
-    print(tts_message)
     sound = gTTS(text=tts_message, lang="th", slow=False)
     sound.save("join.mp3")
     tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
     vc.play(tts_audio_file)
     while vc.is_playing():  # Wait for the TTS audio to finish playing
         await asyncio.sleep(1)
+    console.log(tts_message)
     await vc.disconnect()
 
 async def tts_vc(ctx, user, message, err_msg):
@@ -54,13 +57,13 @@ async def tts_vc(ctx, user, message, err_msg):
         while not q.empty():
             if not vc.is_playing():
                 tts_message = q.get()
-                print(tts_message)
+                console.log(tts_message)
                 sound = gTTS(text=tts_message, lang="th", slow=False)
                 sound.save("tts.mp3")
                 source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                 vc.play(source)
                 while vc.is_playing():
-                    await asyncio.sleep(10)
+                    await asyncio.sleep(5)
             else:
                 await asyncio.sleep(10)
         if q.empty():
@@ -71,18 +74,18 @@ async def tts_vc(ctx, user, message, err_msg):
 
 @client.event
 async def on_ready():
-    print(f'{client.user.name} has connected to Discord!')
+    console.log(f'{client.user.name} has connected to Discord!')
     await client.change_presence(activity=discord.Game(name="Star Citizen"))
     for guild in client.guilds:
 		# PRINT THE SERVER'S ID AND NAME.
-	    print(f"- {guild.id} | {guild.name}")
+	    console.log(f"- {guild.id} | {guild.name}")
 
-async def add_coin(user,source):
+async def add_coin(user, amount,source):
     channel = await client.fetch_channel(TEXT_CHANNEL_ID)
-    coin = random.random()
+    coin = amount
     if not user.bot:
         await channel.send(f"<@{user.id}> recieved {coin} IDS Coins from {source}.")
-        print(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
+        console.log(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
         user_coin = ref.child(f"{user.id}").child('coin').get()
         if user_coin:
             coin += user_coin
@@ -95,46 +98,52 @@ bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give"
 @client.event
 async def on_message(message):
     user = message.author
+    coin = random.random()
     if user.id != client.user.id and message.content not in bot_command:
-        await add_coin(user, "new message")
+        await add_coin(user, coin,"new message")
+    elif message.type == discord.MessageType.premium_guild_subscription:
+        await add_coin(user, 150.0,"boosted the server")
     await client.process_commands(message)
 
 @client.event
 async def on_raw_reaction_add(payload):
     user = await client.fetch_user(payload.user_id)
-    await add_coin(user, "reaction")
+    coin = random.random()
+    await add_coin(user, coin, "reaction")
 
 @client.event
 async def on_member_join(member):
-    await add_coin(member, "new member")
+    coin = random.random()
+    await add_coin(member, coin, "new member")
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    username = member.display_name.split('[')
-    if before.channel is None and after.channel is not None and not after.afk:
+    # username = member.display_name.split('[')
+    if before.channel is None and after.channel is not None and not after.afk and not member.bot:
         # A user joined a voice channel
         message = 'เข้ามาในห้องแล้ว'
-        await add_coin(member, "join vc")
-        await noti(username, after, message)
-    elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress:
+        await noti(member, after, message)
+        coin = random.random()
+        await add_coin(member, coin, "join vc")
+    elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot:
         # A user moved to another voice channel
         message = 'ย้านมาในห้องนี้แล้ว'
-        await noti(username, after, message)
-    elif after.channel and before.afk and not after.afk:
+        await noti(member, after, message)
+    elif after.channel and before.afk and not after.afk and not member.bot:
         # A user's back from AFK to voice channel
         message = 'กลับมาจาก AFK แล้ว'
-        await noti(username, after, message)
+        await noti(member, after, message)
 
-@client.event
-async def on_error(event, *args, **kwargs):
-    """
-    Log the errors
-    """
-    with open('err.log', 'a') as f:
-        if event == 'on_voice_state_update':
-            f.write(f'Unhandled message: {args[0]}\n')
-        else:
-            raise
+# @client.event
+# async def on_error(event, *args, **kwargs):
+#     """
+#     Log the errors
+#     """
+#     with open('err.log', 'a') as f:
+#         if event == 'on_voice_state_update':
+#             f.write(f'Unhandled message: {args[0]}\n')
+#         else:
+#             raise
 
 
 @client.command(name='summon', help='This command will make the bot join the voice channel')
@@ -163,14 +172,14 @@ async def balance(ctx):
     coin = ref.child(f"{user.id}").child('coin').get()
     embed = discord.Embed(
         color=discord.Color.dark_purple(),
-        description= f"Balance: {coin}",
+        description= f"Balance: `{coin}`",
         title= f"{user.display_name}'s Wallet"
     )
     embed.set_author(name="Bank of IDS")
     embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
     if coin:
         await ctx.send(embed=embed)
-        print(f"{user.id}'s balance: {coin} IDS Coins.")
+        console.log(f"{user.id}'s balance: {coin} IDS Coins.")
     else:
         await ctx.send("You have no IDS coins")
 
@@ -200,14 +209,14 @@ async def give(ctx, user: discord.Member, amount: float):
         description= f"IDS Coin Transfer Transaction"
         )
 
-        embed.add_field(name=sender.display_name, value=sender_coin, inline=True)
-        embed.add_field(name="Fee", value=0, inline=True)
-        embed.add_field(name=receiver.display_name, value=amount, inline=True)
+        embed.add_field(name="Sender", value=sender.display_name, inline=True)
+        embed.add_field(name=":arrow_right:", value=f"`{amount}`", inline=True)
+        embed.add_field(name="Recipient", value=receiver.display_name, inline=True)
 
         # await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
         await ctx.send(embed=embed)
         await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
-        print(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
+        console.log(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
     else:
         await ctx.send("Insufficient IDS coin balance")
 
@@ -227,7 +236,15 @@ async def rank(ctx):
     )
     names = ''
     for rank, user in enumerate(leaderboard):
-        names += f"{rank+1}. <@{user}> : {leaderboard[user]} :coin:\n"
+        if rank+1 == 1:
+            rank =":first_place:"
+        elif rank+1 == 2:
+            rank =":second_place:"
+        elif rank+1 == 3:
+            rank =":third_place:"
+        else:
+            rank = rank+1
+        names += f"{rank}. <@{user}> : {leaderboard[user]} :coin:\n"
     embed.add_field(name="Names", value=names, inline=False)
     await ctx.send(embed=embed)
 
@@ -241,6 +258,21 @@ async def say(ctx, *args):
     message = f'{username[0]} พูดว่า {args}'
     err_msg = 'You are not in a voice channel.'
     await tts_vc(ctx, user, message, err_msg)
+
+@client.command(name="welcome", help="Welcome new member")
+async def welcome(ctx):
+    avatar = ctx.author.avatar
+    username = ctx.author.name
+    W , H = (1100, 500)
+    text = f"Welcome {username} to IDS"
+    img =Image.open("Asset/ids_bg.png")
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("arial.ttf", 60)
+    text_size =draw.textlength(text, font=font)
+    draw.text(((W-text_size)/ 2, 320), text, fill=(255, 255, 255, 255), font=font, aligh="center")
+    img.save("text.png")
+
+    await ctx.send(file= discord.File("text.png"))
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
