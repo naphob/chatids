@@ -46,14 +46,17 @@ class Roles(discord.ui.View):
         user = interaction.user
         regex = "^(\W|\w)+\[(\w|\W)+\]$"
         match = re.match(regex, user.display_name)
+        button.disabled = True
         if role in [r.id for r in user.roles]:
-            button.disable = True
+            button.disabled = True
         else:
             if match:
                 await user.add_roles(user.guild.get_role(role))
                 await interaction.response.send_message("คุณได้รับยศแล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
+                console.log(f"Add role to {user.display_name}")
                 new_face = 1045127837989994568
                 await user.remove_roles(user.guild.get_role(new_face))
+                console.log(f"Remove role from {user.display_name}")
             else:
                 await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
 
@@ -120,16 +123,17 @@ async def welcome_pic(user):
     img =Image.open("Asset/ids_bg.png")
     W, H = img.size
     avatar = Image.open("Asset/avatar.png")
-
+    size = (240, 240)
+    avatar = avatar.resize(size, Image.Resampling.LANCZOS)
     mask_img = Image.new("L", avatar.size, 0)
     mask_draw = ImageDraw.Draw(mask_img)
     mask_draw.ellipse((0, 0) + avatar.size, fill=255)
     mask_img.save("Asset/mask_circle.jpg", quality=95)
-
     draw = ImageDraw.Draw(img)
     font = ImageFont.truetype("arial.ttf", 50)
     count_font = ImageFont.truetype("arial.ttf", 32)
-    img.paste(avatar ,(400, 50), mask_img)
+
+    img.paste(avatar ,(440, 80), mask_img)
     text_size =draw.textlength(text, font=font)
     count_size =draw.textlength(member_text, font=count_font)
     draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
@@ -325,7 +329,7 @@ async def say(ctx, *args):
     await tts_vc(ctx, user, message, err_msg)
 
 @client.command(name="welcome", help="Welcome new member")
-async def welcome(ctx):
+async def welcome(ctx, user: discord.Member):
     # await ctx.author.display_avatar.save('Asset/avatar.png')
     # avatar = Image.open('Asset/avatar.png')
     # count = ctx.guild.member_count
@@ -351,7 +355,7 @@ async def welcome(ctx):
     # draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
     # img.save("text.png")
     # await ctx.send(file= discord.File("text.png"))
-    await welcome_pic(ctx.author)
+    await welcome_pic(user)
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
