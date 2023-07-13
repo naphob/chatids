@@ -1,12 +1,14 @@
 import os
-from rich.console import Console
+import re
 import random
 import discord
 import asyncio
+import discord.ui
 from gtts import gTTS
 from queue import Queue
 from dotenv import load_dotenv
 from discord.ext import commands
+from rich.console import Console
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
@@ -15,14 +17,16 @@ from PIL import Image, ImageFont, ImageDraw
 console = Console()
 load_dotenv()
 credential = os.getenv("FIREBASE_CREDENTIALS")
+DB_URL = os.getenv("DB_URL")
 cred = credentials.Certificate(credential)
 firebase_admin.initialize_app(cred, {
-    'databaseURL': 'https://ids-bot-9ac6a-default-rtdb.asia-southeast1.firebasedatabase.app/'
+    'databaseURL': DB_URL
 })
 
 ref = db.reference('users')
 TOKEN = os.getenv("TOKEN")
 TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
+WELCOME_CHANNEL_ID = 1037740797518430308
 counter = 0
 connections = {}
 COMMAND_PREFIX = '!'
@@ -32,6 +36,26 @@ client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, descriptio
 
 #create a queue for tts message
 q = Queue()
+
+class Roles(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+    @discord.ui.button(label="รับยศ", custom_id="role 1", style=discord.ButtonStyle.primary, emoji="🚀")
+    async def button_callback(self, button, interaction):
+        role = 1124564123640942673
+        user = interaction.user
+        regex = "^(\W|\w)+\[(\w|\W)+\]$"
+        match = re.match(regex, user.display_name)
+        if role in [r.id for r in user.roles]:
+            button.disable = True
+        else:
+            if match:
+                await user.add_roles(user.guild.get_role(role))
+                await interaction.response.send_message("คุณได้รับยศแล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
+                new_face = 1045127837989994568
+                await user.remove_roles(user.guild.get_role(new_face))
+            else:
+                await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
 
 async def noti(member, channel, message):
     username = member.display_name.split('[')
@@ -72,14 +96,6 @@ async def tts_vc(ctx, user, message, err_msg):
     else:
         await ctx.send(err_msg)
 
-@client.event
-async def on_ready():
-    console.log(f'{client.user.name} has connected to Discord!')
-    await client.change_presence(activity=discord.Game(name="Star Citizen"))
-    for guild in client.guilds:
-		# PRINT THE SERVER'S ID AND NAME.
-	    console.log(f"- {guild.id} | {guild.name}")
-
 async def add_coin(user, amount,source):
     channel = await client.fetch_channel(TEXT_CHANNEL_ID)
     coin = amount
@@ -93,10 +109,56 @@ async def add_coin(user, amount,source):
         'coin' : coin
         })
 
-bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
+async def welcome_pic(user):
+    channel = client.get_channel(WELCOME_CHANNEL_ID)
+    await user.display_avatar.save('Asset/avatar.png')
+    avatar = Image.open('Asset/avatar.png')
+    count = user.guild.member_count
+    username = user.name
+    text = f"Welcome {username} to IDS"
+    member_text = f"Member #{count}"
+    img =Image.open("Asset/ids_bg.png")
+    W, H = img.size
+    avatar = Image.open("Asset/avatar.png")
+
+    mask_img = Image.new("L", avatar.size, 0)
+    mask_draw = ImageDraw.Draw(mask_img)
+    mask_draw.ellipse((0, 0) + avatar.size, fill=255)
+    mask_img.save("Asset/mask_circle.jpg", quality=95)
+
+    draw = ImageDraw.Draw(img)
+    font = ImageFont.truetype("arial.ttf", 50)
+    count_font = ImageFont.truetype("arial.ttf", 32)
+    img.paste(avatar ,(400, 50), mask_img)
+    text_size =draw.textlength(text, font=font)
+    count_size =draw.textlength(member_text, font=count_font)
+    draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
+    draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
+    img.save("text.png")
+
+    embed = discord.Embed(
+        title = "Welcome to the verse",
+        description=f"ยินดีต้อนรับคุณ <@{user.id}>  สู่ Intergalactic Defense Security!",
+        color=discord.Color.dark_purple()
+    )
+    rule = "1. เปลี่ยนชื่อ : ชื่อเล่น [ชื่อในเกม]\nตัวอย่างการเปลี่ยนชื่อ : Poon [CaptainWolffe]\n2.กดรับยศเพื่อเห็นห้องที่เกี่ยวข้อง"
+    embed.add_field(name="อย่าลืม!", value=rule)
+
+    await channel.send(embed=embed, file= discord.File("text.png"), view=Roles())
+
+@client.event
+async def on_ready():
+    console.log(f'{client.user.name} has connected to Discord!')
+    client.add_view(Roles())
+    await client.change_presence(activity=discord.Game(name="Star Citizen"))
+    for guild in client.guilds:
+		# PRINT THE SERVER'S ID AND NAME.
+	    console.log(f"- {guild.id} | {guild.name}")
+
 
 @client.event
 async def on_message(message):
+    bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
     user = message.author
     coin = random.random()
     if user.id != client.user.id and message.content not in bot_command:
@@ -113,8 +175,11 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_member_join(member):
-    coin = random.random()
-    await add_coin(member, coin, "new member")
+    # coin = random.random()
+    # await add_coin(member, coin, "new member")
+    role = 1045127837989994568
+    await member.add_roles(member.guild.get_role(role))
+    await welcome_pic(member)
 
 @client.event
 async def on_voice_state_update(member, before, after):
@@ -261,23 +326,32 @@ async def say(ctx, *args):
 
 @client.command(name="welcome", help="Welcome new member")
 async def welcome(ctx):
-    avatar = ctx.author.avatar
-    count = ctx.guild.member_count
-    username = ctx.author.name
-    W , H = (1100, 500)
-    text = f"Welcome {username} to IDS"
-    member_text = f"Member #{count}"
-    img =Image.open("Asset/ids_bg.png")
-    draw = ImageDraw.Draw(img)
-    font = ImageFont.truetype("arial.ttf", 50)
-    count_font = ImageFont.truetype("arial.ttf", 32)
-    text_size =draw.textlength(text, font=font)
-    count_size =draw.textlength(member_text, font=count_font)
-    draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
-    draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
-    img.save("text.png")
+    # await ctx.author.display_avatar.save('Asset/avatar.png')
+    # avatar = Image.open('Asset/avatar.png')
+    # count = ctx.guild.member_count
+    # username = ctx.author.name
+    # text = f"Welcome {username} to IDS"
+    # member_text = f"Member #{count}"
+    # img =Image.open("Asset/ids_bg.png")
+    # W, H = img.size
+    # avatar = Image.open("Asset/avatar.png")
 
-    await ctx.send(file= discord.File("text.png"))
+    # mask_img = Image.new("L", avatar.size, 0)
+    # mask_draw = ImageDraw.Draw(mask_img)
+    # mask_draw.ellipse((0, 0) + avatar.size, fill=255)
+    # mask_img.save("Asset/mask_circle.jpg", quality=95)
+
+    # draw = ImageDraw.Draw(img)
+    # font = ImageFont.truetype("arial.ttf", 50)
+    # count_font = ImageFont.truetype("arial.ttf", 32)
+    # img.paste(avatar ,(400, 50), mask_img)
+    # text_size =draw.textlength(text, font=font)
+    # count_size =draw.textlength(member_text, font=count_font)
+    # draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
+    # draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
+    # img.save("text.png")
+    # await ctx.send(file= discord.File("text.png"))
+    await welcome_pic(ctx.author)
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
