@@ -240,7 +240,11 @@ async def summon(ctx):
     """
     command to join voice channel
     """
-    channel = ctx.author.voice.channel
+    if not ctx.author.voice:
+        await ctx.send(f"{ctx.author.display_name} is not connected to a voice channel")
+        return
+    else:
+        channel = ctx.author.voice.channel
     await channel.connect()
 
 @client.command(name='leave', help='This command will make the bot leave the voice channel')
@@ -423,7 +427,7 @@ async def once_done(sink: discord.sinks, member: discord.Member, user: discord.U
     await vc.disconnect()
 
 @client.command()
-async def stop(ctx):
+async def stop_rec(ctx):
     if ctx.guild.id in connections:  # Check if the guild is in the cache.
         vc = connections[ctx.guild.id]
         vc.stop_recording()  # Stop recording, and call the callback (once_done).
