@@ -83,7 +83,10 @@ class Roles(discord.ui.View):
 async def noti(member, channel, message):
     username = member.display_name.split('[')
     tts_message = f'{username[0]} {message}'
-    vc = await channel.channel.connect()
+    try:
+        vc = await channel.channel.connect()
+    except:
+        vc = member.voice_client
     sound = gTTS(text=tts_message, lang="th", slow=False)
     sound.save("join.mp3")
     tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
