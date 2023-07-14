@@ -40,7 +40,7 @@ q = Queue()
 class Roles(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-    @discord.ui.button(label="รับยศ", custom_id="role 1", style=discord.ButtonStyle.primary, emoji="🚀")
+    @discord.ui.button(label="Star Citizen", custom_id="role 1", style=discord.ButtonStyle.primary, emoji="🚀")
     async def button_callback(self, button, interaction):
         role = 1124564123640942673
         user = interaction.user
@@ -53,6 +53,26 @@ class Roles(discord.ui.View):
             if match:
                 await user.add_roles(user.guild.get_role(role))
                 await interaction.response.send_message("คุณได้รับยศแล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
+                console.log(f"Add role to {user.display_name}")
+                new_face = 1045127837989994568
+                await user.remove_roles(user.guild.get_role(new_face))
+                console.log(f"Remove role from {user.display_name}")
+            else:
+                await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
+
+    @discord.ui.button(label="Guest", custom_id="role 2", style=discord.ButtonStyle.primary, emoji="🙏")
+    async def button_callback_guest(self, button, interaction):
+        role = 1092322716415172658
+        user = interaction.user
+        regex = "^(\W|\w)+\[(\w|\W)+\]$"
+        match = re.match(regex, user.display_name)
+        button.disabled = True
+        if role in [r.id for r in user.roles]:
+            button.disabled = True
+        else:
+            if match:
+                await user.add_roles(user.guild.get_role(role))
+                await interaction.response.send_message("คุณได้รับยศแล้ว ขอให้สนุกกับการเล่นเกมกับพวกเรา", ephemeral = True)
                 console.log(f"Add role to {user.display_name}")
                 new_face = 1045127837989994568
                 await user.remove_roles(user.guild.get_role(new_face))
@@ -138,7 +158,7 @@ async def welcome_pic(user):
     count_size =draw.textlength(member_text, font=count_font)
     draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
     draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
-    img.save("text.png")
+    img.save("Assest/text.png")
 
     embed = discord.Embed(
         title = "Welcome to the verse",
