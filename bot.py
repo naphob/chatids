@@ -161,7 +161,7 @@ async def welcome_pic(user):
     count_size =draw.textlength(member_text, font=count_font)
     draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
     draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
-    img.save("Asset/text.png")
+    img.save('Asset/text.png')
 
     embed = discord.Embed(
         title = "Welcome to the verse",
@@ -171,7 +171,7 @@ async def welcome_pic(user):
     rule = "1. เปลี่ยนชื่อ : ชื่อเล่น [ชื่อในเกม]\nตัวอย่างการเปลี่ยนชื่อ : Poon [CaptainWolffe]\n2.กดรับยศเพื่อเห็นห้องที่เกี่ยวข้อง"
     embed.add_field(name="อย่าลืม!", value=rule)
 
-    await channel.send(embed=embed, file= discord.File("text.png"), view=Roles())
+    await channel.send(embed=embed, file= discord.File('Asset/text.png'), view=Roles())
 
 @client.event
 async def on_ready():
