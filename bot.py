@@ -161,7 +161,7 @@ async def welcome_pic(user):
     count_size =draw.textlength(member_text, font=count_font)
     draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
     draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
-    img.save("Assest/text.png")
+    img.save("Asset/text.png")
 
     embed = discord.Embed(
         title = "Welcome to the verse",
