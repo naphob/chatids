@@ -168,7 +168,7 @@ async def welcome_pic(user):
         description=f"ยินดีต้อนรับคุณ <@{user.id}>  สู่ Intergalactic Defense Security!",
         color=discord.Color.dark_purple()
     )
-    rule = "1. เปลี่ยนชื่อ : ชื่อเล่น [ชื่อในเกม]\nตัวอย่างการเปลี่ยนชื่อ : Poon [CaptainWolffe]\n2.กดรับยศเพื่อเห็นห้องที่เกี่ยวข้อง"
+    rule = "1. เปลี่ยนชื่อ : `ชื่อเล่น [ชื่อในเกม]`\nตัวอย่างการเปลี่ยนชื่อ : `Poon [CaptainWolffe]`\n2. กดรับยศเพื่อเห็นห้องที่เกี่ยวข้อง"
     embed.add_field(name="อย่าลืม!", value=rule)
 
     await channel.send(embed=embed, file= discord.File('Asset/text.png'), view=Roles())
