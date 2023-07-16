@@ -60,7 +60,7 @@ class Roles(discord.ui.View):
             else:
                 await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
 
-    @discord.ui.button(label="Guest", custom_id="role 2", style=discord.ButtonStyle.primary, emoji="🙏")
+    @discord.ui.button(label="เกมอื่นๆ", custom_id="role 2", style=discord.ButtonStyle.primary, emoji="🕹️")
     async def button_callback_guest(self, button, interaction):
         role = 1092322716415172658
         user = interaction.user
@@ -168,7 +168,7 @@ async def welcome_pic(user):
         description=f"ยินดีต้อนรับคุณ <@{user.id}>  สู่ Intergalactic Defense Security!",
         color=discord.Color.dark_purple()
     )
-    rule = "1. เปลี่ยนชื่อ : `ชื่อเล่น [ชื่อในเกม]`\nตัวอย่างการเปลี่ยนชื่อ : `Poon [CaptainWolffe]`\n2. กดรับยศเพื่อเห็นห้องที่เกี่ยวข้อง"
+    rule = "1. เปลี่ยนชื่อ : `ชื่อเล่น [ชื่อในเกม]`\nตัวอย่างการเปลี่ยนชื่อ : `Poon [CaptainWolffe]`\n2. กดรับยศเพื่อเห็นห้องของเกมที่จะเล่น"
     embed.add_field(name="อย่าลืม!", value=rule)
 
     await channel.send(embed=embed, file= discord.File('Asset/text.png'), view=Roles())
