@@ -60,7 +60,7 @@ class Roles(discord.ui.View):
             else:
                 await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
 
-    @discord.ui.button(label="เกมอื่นๆ", custom_id="role 2", style=discord.ButtonStyle.primary, emoji="🕹️")
+    @discord.ui.button(label="เกมอื่นๆ", custom_id="role 2", style=discord.ButtonStyle.success, emoji="🕹️")
     async def button_callback_guest(self, button, interaction):
         role = 1092322716415172658
         user = interaction.user
