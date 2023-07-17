@@ -188,10 +188,10 @@ async def on_message(message):
     bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
     user = message.author
     coin = random.random()
-    if user.id != client.user.id and message.content not in bot_command:
-        await add_coin(user, coin,"new message")
-    elif message.type == discord.MessageType.premium_guild_subscription:
+    if message.type == discord.MessageType.premium_guild_subscription:
         await add_coin(user, 150.0,"boosted the server")
+    elif user.id != client.user.id and message.content not in bot_command:
+        await add_coin(user, coin,"new message")
     await client.process_commands(message)
 
 @client.event
@@ -202,15 +202,12 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_member_join(member):
-    # coin = random.random()
-    # await add_coin(member, coin, "new member")
     role = 1045127837989994568
     await member.add_roles(member.guild.get_role(role))
     await welcome_pic(member)
 
 @client.event
 async def on_voice_state_update(member, before, after):
-    # username = member.display_name.split('[')
     if before.channel is None and after.channel is not None and not after.afk and not member.bot:
         # A user joined a voice channel
         message = 'เข้ามาในห้องแล้ว'
@@ -225,17 +222,6 @@ async def on_voice_state_update(member, before, after):
         # A user's back from AFK to voice channel
         message = 'กลับมาจาก AFK แล้ว'
         await noti(member, after, message)
-
-# @client.event
-# async def on_error(event, *args, **kwargs):
-#     """
-#     Log the errors
-#     """
-#     with open('err.log', 'a') as f:
-#         if event == 'on_voice_state_update':
-#             f.write(f'Unhandled message: {args[0]}\n')
-#         else:
-#             raise
 
 
 @client.command(name='summon', help='This command will make the bot join the voice channel')
