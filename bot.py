@@ -165,7 +165,7 @@ async def welcome_pic(user):
 
     embed = discord.Embed(
         title = "Welcome to the verse",
-        description=f"ยินดีต้อนรับคุณ <@{user.id}>  สู่ Intergalactic Defense Security!",
+        description=f"ยินดีต้อนรับคุณ <@{user.id}>  สู่ Invicta Defense Service!",
         color=discord.Color.dark_purple()
     )
     rule = "1. เปลี่ยนชื่อ : `ชื่อเล่น [ชื่อในเกม]`\nตัวอย่างการเปลี่ยนชื่อ : `Poon [CaptainWolffe]`\n2. กดรับยศเพื่อเห็นห้องของเกมที่จะเล่น"
