@@ -83,18 +83,21 @@ class Roles(discord.ui.View):
 async def noti(member, channel, message):
     username = member.display_name.split('[')
     tts_message = f'{username[0]} {message}'
-    try:
-        vc = await channel.channel.connect()
-    except:
-        vc = member.voice_client
-    sound = gTTS(text=tts_message, lang="th", slow=False)
-    sound.save("join.mp3")
-    tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
-    vc.play(tts_audio_file)
-    while vc.is_playing():  # Wait for the TTS audio to finish playing
-        await asyncio.sleep(1)
-    console.log(tts_message)
-    await vc.disconnect()
+    if client.voice_clients:
+        print("Bot is busy in another room")
+    else:
+        try:
+            vc = await channel.channel.connect()
+        except:
+            vc = client.voice_clients
+        sound = gTTS(text=tts_message, lang="th", slow=False)
+        sound.save("join.mp3")
+        tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
+        vc.play(tts_audio_file)
+        while vc.is_playing():  # Wait for the TTS audio to finish playing
+            await asyncio.sleep(1)
+        console.log(tts_message)
+        await vc.disconnect()
 
 async def tts_vc(ctx, user, message, err_msg):
     if user.voice is not None:
