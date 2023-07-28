@@ -26,7 +26,7 @@ firebase_admin.initialize_app(cred, {
 ref = db.reference('users')
 TOKEN = os.getenv("TOKEN")
 TEXT_CHANNEL_ID = os.getenv("TEXT_CHANNEL_ID")
-WELCOME_CHANNEL_ID = 1037740797518430308
+WELCOME_CHANNEL_ID = os.getenv("WELCOME_CHANNEL_ID")
 counter = 0
 connections = {}
 COMMAND_PREFIX = '!'
@@ -83,13 +83,12 @@ class Roles(discord.ui.View):
 async def noti(member, channel, message):
     username = member.display_name.split('[')
     tts_message = f'{username[0]} {message}'
-    if client.voice_clients:
-        print("Bot is busy in another room")
-    else:
+    if not client.voice_clients:
         try:
             vc = await channel.channel.connect()
         except:
-            vc = client.voice_clients
+            vc = client.voice_clients[0]
+            print("Bot is busy in another room")
         sound = gTTS(text=tts_message, lang="th", slow=False)
         sound.save("join.mp3")
         tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
@@ -98,6 +97,23 @@ async def noti(member, channel, message):
             await asyncio.sleep(1)
         console.log(tts_message)
         await vc.disconnect()
+    else:
+        print(f"Bot is still busy at channel {client.voice_clients[0].channel}")
+        await asyncio.sleep(3)
+        if not client.voice_clients:
+            try:
+                vc = await channel.channel.connect()
+            except:
+                vc = client.voice_clients[0]
+                print("Bot is busy in another room")
+            sound = gTTS(text=tts_message, lang="th", slow=False)
+            sound.save("join.mp3")
+            tts_audio_file = await discord.FFmpegOpusAudio.from_probe('join.mp3', method="fallback")
+            vc.play(tts_audio_file)
+            while vc.is_playing():  # Wait for the TTS audio to finish playing
+                await asyncio.sleep(1)
+            console.log(tts_message)
+            await vc.disconnect()
 
 async def tts_vc(ctx, user, message, err_msg):
     if user.voice is not None:
@@ -116,11 +132,11 @@ async def tts_vc(ctx, user, message, err_msg):
                 source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                 vc.play(source)
                 while vc.is_playing():
-                    await asyncio.sleep(5)
+                    await asyncio.sleep(3)
             else:
-                await asyncio.sleep(10)
+                await asyncio.sleep(8)
         if q.empty():
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
             await vc.disconnect()
     else:
         await ctx.send(err_msg)
@@ -139,7 +155,7 @@ async def add_coin(user, amount,source):
         })
 
 async def welcome_pic(user):
-    channel = client.get_channel(WELCOME_CHANNEL_ID)
+    channel = await client.fetch_channel(WELCOME_CHANNEL_ID)
     await user.display_avatar.save('Asset/avatar.png')
     avatar = Image.open('Asset/avatar.png')
     count = user.guild.member_count
@@ -199,7 +215,7 @@ async def on_message(message):
 
 @client.event
 async def on_raw_reaction_add(payload):
-    user = await client.fetch_user(payload.user_id)
+    user = payload.member
     coin = random.random()
     await add_coin(user, coin, "reaction")
 
@@ -268,7 +284,7 @@ async def balance(ctx):
     else:
         await ctx.send("You have no IDS coins")
 
-@client.command(name="give", help="This command will return coins balance")
+@client.command(name="give", help="This command will transfer coins to other's wallet")
 async def give(ctx, user: discord.Member, amount: float):
     channel = await client.fetch_channel(TEXT_CHANNEL_ID)
     sender = ctx.author
@@ -329,7 +345,7 @@ async def rank(ctx):
             rank =":third_place:"
         else:
             rank = rank+1
-        names += f"{rank}. <@{user}> : {leaderboard[user]} :coin:\n"
+        names += f"{rank} <@{user}> : {leaderboard[user]} :coin:\n"
     embed.add_field(name="Names", value=names, inline=False)
     await ctx.send(embed=embed)
 
@@ -346,31 +362,6 @@ async def say(ctx, *args):
 
 @client.command(name="welcome", help="Welcome new member")
 async def welcome(ctx, user: discord.Member):
-    # await ctx.author.display_avatar.save('Asset/avatar.png')
-    # avatar = Image.open('Asset/avatar.png')
-    # count = ctx.guild.member_count
-    # username = ctx.author.name
-    # text = f"Welcome {username} to IDS"
-    # member_text = f"Member #{count}"
-    # img =Image.open("Asset/ids_bg.png")
-    # W, H = img.size
-    # avatar = Image.open("Asset/avatar.png")
-
-    # mask_img = Image.new("L", avatar.size, 0)
-    # mask_draw = ImageDraw.Draw(mask_img)
-    # mask_draw.ellipse((0, 0) + avatar.size, fill=255)
-    # mask_img.save("Asset/mask_circle.jpg", quality=95)
-
-    # draw = ImageDraw.Draw(img)
-    # font = ImageFont.truetype("arial.ttf", 50)
-    # count_font = ImageFont.truetype("arial.ttf", 32)
-    # img.paste(avatar ,(400, 50), mask_img)
-    # text_size =draw.textlength(text, font=font)
-    # count_size =draw.textlength(member_text, font=count_font)
-    # draw.text(((W-text_size)/ 2, 340), text, fill=(255, 255, 255, 255), font=font, aligh="center")
-    # draw.text(((W-count_size)/ 2, 400), member_text, fill="grey", font=count_font, aligh="center")
-    # img.save("text.png")
-    # await ctx.send(file= discord.File("text.png"))
     await welcome_pic(user)
 
 # Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
@@ -382,7 +373,7 @@ async def send(ctx, member: discord.Member, *args):
     err_msg = 'Receiver is not in a voice channel.'
     await tts_vc(ctx, member, message, err_msg)
 
-@client.command()
+@client.command(name="rec", help="This command will record your voice message then send it to targeted user after stop recording")
 async def rec(ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
     voice = ctx.author.voice
 
@@ -418,7 +409,7 @@ async def once_done(sink: discord.sinks, member: discord.Member, user: discord.U
         await asyncio.sleep(10)
     await vc.disconnect()
 
-@client.command()
+@client.command(name="stop_rec", help="This command will stop recording your voice message")
 async def stop_rec(ctx):
     if ctx.guild.id in connections:  # Check if the guild is in the cache.
         vc = connections[ctx.guild.id]
