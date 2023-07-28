@@ -241,6 +241,11 @@ async def on_voice_state_update(member, before, after):
         # A user's back from AFK to voice channel
         message = 'กลับมาจาก AFK แล้ว'
         await noti(member, after, message)
+    elif after.channel is None and before.channel is not None and not member.bot:
+        # A user left the voice channel
+        message = 'ออกจากห้องไปแล้ว'
+        await noti(member, before, message)
+
 
 
 @client.command(name='summon', help='This command will make the bot join the voice channel')
