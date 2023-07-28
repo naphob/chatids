@@ -32,7 +32,7 @@ connections = {}
 COMMAND_PREFIX = '!'
 intents = discord.Intents.all()
 
-client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, descriptioin="IDS's discord bot assistant")
+client = commands.Bot(command_prefix=COMMAND_PREFIX, intents=intents, descriptioin="IDS's discord assistant bot")
 
 #create a queue for tts message
 q = Queue()
@@ -290,6 +290,7 @@ async def welcome_pic(user):
 async def on_ready():
     console.log(f'{client.user.name} has connected to Discord!')
     client.add_view(Roles())
+    client.add_view(GetRoles())
     await client.change_presence(activity=discord.Game(name="Star Citizen"))
     for guild in client.guilds:
 		# PRINT THE SERVER'S ID AND NAME.
