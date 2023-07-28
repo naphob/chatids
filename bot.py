@@ -98,7 +98,7 @@ async def noti(member, channel, message):
         console.log(tts_message)
         await vc.disconnect()
     else:
-        print(f"Bot is still busy at channel {client.voice_clients[0].channel}")
+        console.log(f"Bot is still busy at channel {client.voice_clients[0].channel}")
         await asyncio.sleep(3)
         if not client.voice_clients:
             try:
