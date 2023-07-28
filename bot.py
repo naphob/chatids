@@ -79,7 +79,7 @@ class Roles(discord.ui.View):
                 console.log(f"Remove {user.guild.get_role(role).name} role from {user.display_name}")
             else:
                 await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
-
+#Self get roles
 class GetRoles(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
@@ -316,7 +316,7 @@ async def on_raw_reaction_add(payload):
 
 @client.event
 async def on_member_join(member):
-    role = 1045127837989994568
+    role = 1045127837989994568 #give new_face role to new joiner so they can see welcome chanel
     await member.add_roles(member.guild.get_role(role))
     await welcome_pic(member)
 
@@ -474,9 +474,12 @@ async def role(ctx):
 
     await ctx.send(embed=embed, view=GetRoles())
 
-# Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
+
 @client.command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
 async def send(ctx, member: discord.Member, *args):
+    '''
+    Command to send voice message to mentioned user in a voice channel. The sender doesn't need to connect to that voice channel
+    '''
     user = ctx.message.author
     username = user.display_name.split('[')
     message = f'{username[0]} ฝากบอกว่า {args}'
@@ -500,7 +503,7 @@ async def rec(ctx, user: discord.Member):  # If you're using commands.Bot, this 
         ctx.author
     )
 
-async def once_done(sink: discord.sinks, member: discord.Member, user: discord.User, *args):  # Our voice client already passes these in.
+async def once_done(sink: discord.sinks, member: discord.Member, user: discord.User, *args):
     recorded_users = [  # A list of recorded users
         f"<@{user_id}>"
         for user_id, audio in sink.audio_data.items()
