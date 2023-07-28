@@ -10,8 +10,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from rich.console import Console
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
+from firebase_admin import credentials, db
 from PIL import Image, ImageFont, ImageDraw
 
 console = Console()
