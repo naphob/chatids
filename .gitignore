@@ -3,3 +3,5 @@ __pycache__/
 *.mp3
 err.log
 *.json
+text.png
+avatar.png

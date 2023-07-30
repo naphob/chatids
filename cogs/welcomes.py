@@ -58,10 +58,8 @@ class Roles(discord.ui.View):
 class GetRoles(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
-    @discord.ui.button(label="Miner", custom_id="miner", style=discord.ButtonStyle.primary, emoji="⛏️")
-    async def miner_button_callback(self, button, interaction):
-        role = 1004496745700540427
-        user = interaction.user
+
+    async def get_role(self, role, user, interaction):
         if role in [r.id for r in user.roles]:
             await user.remove_roles(user.guild.get_role(role))
             await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
@@ -70,84 +68,48 @@ class GetRoles(discord.ui.View):
             await user.add_roles(user.guild.get_role(role))
             await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
             console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+
+    @discord.ui.button(label="Miner", custom_id="miner", style=discord.ButtonStyle.primary, emoji="⛏️")
+    async def miner_button_callback(self, button, interaction):
+        role = 1004496745700540427
+        user = interaction.user
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Special Forces", custom_id="sf", style=discord.ButtonStyle.primary, emoji="🥷")
     async def sf_button_callback(self, button, interaction):
         role = 1004495350977011782
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Crew", custom_id="crew", style=discord.ButtonStyle.primary, emoji="🧑‍🚀")
     async def crew_button_callback(self, button, interaction):
         role = 1013177318686081166
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Trader", custom_id="trader", style=discord.ButtonStyle.primary, emoji="💰")
     async def trader_button_callback(self, button, interaction):
         role = 1008637643866783814
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Medic", custom_id="medic", style=discord.ButtonStyle.primary, emoji="💉")
     async def medic_button_callback(self, button, interaction):
         role = 1134438399957270569
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Engineer", custom_id="engineer", style=discord.ButtonStyle.primary, emoji="🔧")
     async def engineer_button_callback(self, button, interaction):
         role = 1134437490040766515
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
     @discord.ui.button(label="Pilot", custom_id="pilot", style=discord.ButtonStyle.primary, emoji="🛩️")
     async def pilot_button_callback(self, button, interaction):
         role = 1134438658829729833
         user = interaction.user
-        if role in [r.id for r in user.roles]:
-            await user.remove_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้คืนยศ {user.guild.get_role(role).name} แล้ว", ephemeral = True)
-            console.log(f"Remove role {user.guild.get_role(role).name} from {user.display_name}")
-        else:
-            await user.add_roles(user.guild.get_role(role))
-            await interaction.response.send_message(f"คุณได้รับยศ {user.guild.get_role(role).name} แล้ว ขอให้สนุกกับการเล่น Star Citizen", ephemeral = True)
-            console.log(f"Add role {user.guild.get_role(role).name} to {user.display_name}")
+        await self.get_role(role, user, interaction)
 
 class Welcomes(commands.Cog):
     def __init__(self, bot):
