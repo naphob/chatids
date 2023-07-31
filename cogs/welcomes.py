@@ -15,6 +15,7 @@ WELCOME_CHANNEL_ID = 1037740797518430308
 class Roles(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=None)
+
     @discord.ui.button(label="Star Citizen", custom_id="role 1", style=discord.ButtonStyle.primary, emoji="🚀")
     async def button_callback(self, button, interaction):
         role = 1124564123640942673
@@ -114,16 +115,6 @@ class GetRoles(discord.ui.View):
 class Welcomes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        console.log(f'{self.bot.user.name} has connected to Discord!')
-        self.bot.add_view(Roles())
-        self.bot.add_view(GetRoles())
-        await self.bot.change_presence(activity=discord.Game(name="Star Citizen"))
-        for guild in self.bot.guilds:
-            # PRINT THE SERVER'S ID AND NAME.
-            console.log(f"- {guild.id} | {guild.name}")
 
     async def welcome_pic(self, user):
         channel = await self.bot.fetch_channel(WELCOME_CHANNEL_ID)
