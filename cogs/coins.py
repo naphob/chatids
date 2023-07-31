@@ -65,7 +65,7 @@ class Coins(commands.Cog):
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
             await ctx.respond(embed=embed)
-            console.log(f"{user.id}'s balance: {coin} IDS Coins.")
+            console.log(f"{user.display_name}'s balance: {coin} IDS Coins.")
         else:
             await ctx.respond("You have no IDS coins")
 
