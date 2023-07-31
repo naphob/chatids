@@ -1,5 +1,6 @@
 __pycache__/
 .env
+*.txt
 *.mp3
 err.log
 *.json
