@@ -13,7 +13,7 @@ class MyView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=False)
+    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=True)
     async def button_callback(self, button, interaction):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         user = interaction.user
