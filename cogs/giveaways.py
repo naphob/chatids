@@ -34,7 +34,6 @@ class MyView(discord.ui.View):
                 rewards = f"`{coin} IDS Coins`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
                 await interaction.response.send_message(embed=embed, ephemeral = True)
-                await channel.send(f"<@{user.id}> got {rewards} from giveaway")
             elif result == 'star citizen':
                 await coins.add_coin(user, coin, "giveaway")
                 rewards = f"1. `{coin} IDS Coins`\n2. `Star Citizen Gift Card มูลค่า $10`"
