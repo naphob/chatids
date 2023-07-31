@@ -6,7 +6,7 @@ from rich.console import Console
 console = Console()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
 recipients = []
-reward_pool = ['nitro', 'nitro', 'nitro', 'star citizen', 'star citizen', 'coin', 'coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin','coin']
+reward_pool = ['coin', 'coin', 'nitro', 'coin', 'coin', 'coin', 'coin', 'nitro', 'coin', 'coin', 'coin', 'star citizen', 'coin', 'coin', 'coin', 'coin', 'nitro', 'coin', 'coin', 'star citizen', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin']
 
 class MyView(discord.ui.View):
     def __init__(self, bot):
