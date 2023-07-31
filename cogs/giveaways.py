@@ -18,7 +18,7 @@ class MyView(discord.ui.View):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         user = interaction.user
         coins = self.bot.get_cog('Coins')
-        coin = 0.1
+        coin = 500
         embed = discord.Embed(
             title = "🎊 กิจกรรมฉลองครบรอบ 1 ปี 🎊",
                 description = "เนื่องในโอกาสครบรอบ 1 ปี IDS discord server วันที่ 3 สิงหาคม ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
