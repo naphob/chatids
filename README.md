@@ -13,5 +13,5 @@ a discord bot that creates voice notification when a user joins a voice channel
 ### Coins system
 - Minting coins to a user related to their activities in the server
 - Transfering coins to others
-- Cheking coin balance
+- Checking coin balance
 - Checking coin leaderboard

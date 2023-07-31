@@ -17,6 +17,7 @@ cogs_list = [
     'coins',
     'giveaways'
 ]
+
 @bot.event
 async def on_ready():
         console.log(f'{bot.user.name} has connected to Discord!')
