@@ -41,6 +41,7 @@ class MyView(discord.ui.View):
                 embed.set_image(url="https://robertsspaceindustries.com/media/kh65mcqfdj5j0r/slideshow/GiftCard_10Dollars_FINAL-1-Min.png")
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
                 await channel.send(f"<@{user.id}> got Star Citizen gift card from giveaway")
+                console.log(f"<@{user.display_name}> got Star Citizen gift card from giveaway")
             elif result == 'nitro':
                 await coins.add_coin(user, coin, "giveaway")
                 with open("nitro.txt", "r") as f:
@@ -50,6 +51,7 @@ class MyView(discord.ui.View):
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
                 await channel.send(f"<@{user.id}> got Nitro from giveaway")
+                console.log(f"<@{user.display_name}> got Nitro from giveaway")
                 with open('nitro.txt', 'r+', encoding='utf-8') as txt_file:
                     lines = txt_file.readlines()
                     txt_file.seek(0)
