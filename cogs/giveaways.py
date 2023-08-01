@@ -19,12 +19,12 @@ class MyView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=True)
+    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=False)
     async def button_callback(self, button, interaction):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         user = interaction.user
         coins = self.bot.get_cog('Coins')
-        coin = 500
+        coin = 500.0
         embed = discord.Embed(
             title = "🎊 กิจกรรมฉลองครบรอบ 1 ปี 🎊",
                 description = "เนื่องในโอกาสครบรอบ 1 ปี IDS discord server วันที่ 3 สิงหาคม ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
@@ -90,7 +90,12 @@ class Giveaways(commands.Cog):
             embed.add_field(name="รางวัล", value=rewards, inline=False)
             embed.add_field(name="เงื่อนไข", value=remark, inline=False)
             view=MyView(self.bot)
-            await ctx.send("@everyone มาร่วมกิจกรรมกัน",embed =embed, view=view)
+            message =await ctx.send("@everyone มาร่วมกิจกรรมกัน",embed =embed, view=view)
+            await message.add_reaction("🎉")
+            await message.add_reaction("🎊")
+            await message.add_reaction("🎁")
+            await message.add_reaction("🎆")
+            await message.add_reaction("💰")
         else:
             await ctx.send_response("You don't have permission for this command.", ephemeral=True)
 
