@@ -37,12 +37,12 @@ class Coins(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
+        # bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
         user = message.author
         coin = random.random()
         if message.type == discord.MessageType.premium_guild_subscription:
             await self.add_coin(user, 150.0,"boosting the server")
-        elif user.id != self.bot.user.id and message.content not in bot_command:
+        elif user.id != self.bot.user.id and message.content.startswith('!'):
             await self.add_coin(user, coin,"new message")
         # await self.bot.process_commands(message)
 
