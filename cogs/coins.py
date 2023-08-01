@@ -42,7 +42,7 @@ class Coins(commands.Cog):
         coin = random.random()
         if message.type == discord.MessageType.premium_guild_subscription:
             await self.add_coin(user, 150.0,"boosting the server")
-        elif user.id != self.bot.user.id and not message.content.startswith('!'):
+        elif user.id != self.bot.user.id or not message.content.startswith('!'):
             await self.add_coin(user, coin,"new message")
         # await self.bot.process_commands(message)
 
