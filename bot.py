@@ -22,7 +22,6 @@ cogs_list = [
 ]
 
 @bot.event
-@bot.event
 async def on_ready():
         console.log(f'{bot.user.name} has connected to Discord!')
         bot.add_view(Roles())
@@ -36,8 +35,5 @@ async def on_ready():
 
 for cog in cogs_list:
     bot.load_extension(f'cogs.{cog}')
-for cog in cogs_list:
-    bot.load_extension(f'cogs.{cog}')
 
-bot.run(TOKEN)
 bot.run(TOKEN)
