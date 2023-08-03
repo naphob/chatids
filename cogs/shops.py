@@ -62,7 +62,7 @@ class Shops(commands.Cog):
             price = 1500
         embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
         embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
-        embed.add_field(name="Price", value=f"~~3,499~~ **{price:,}* IDS Coin")
+        embed.add_field(name="Price", value=f"~~3,499~~ **{price:,}** IDS Coin")
         embed.add_field(name="Stock", value=f"{stock}")
         view=ShopView(self.bot, price)
         await ctx.respond(embed=embed, view=view)
