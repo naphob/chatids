@@ -17,16 +17,17 @@ class ShopView(discord.ui.View):
         coins = self.bot.get_cog('Coins')
         user = interaction.user
         user_coin = await coins.check_coin(user)
-        if user_coin >= self.price:
+        with open("nitro.txt", "r") as f:
+            lines = f.readlines()
+            nitro = lines[0]
+            stock = len(lines)
+        if user_coin >= self.price and stock > 0:
             remaining = await coins.deduct_coin(user, self.price)
             embed = discord.Embed(
             title = "Discord Nitro 1 Month",
                 description = "กรุณาคลิ๊กลิงค์ข้างล่างเพื่อทำการใช้งานดิสคอร์ดไนโตร",
                 color = discord.Color.dark_green()
             )
-            with open("nitro.txt", "r") as f:
-                    lines = f.readlines()
-                    nitro = lines[0]
             rewards = f"Discord Nitro Gift Card 1 Month\n {nitro}"
             embed.add_field(name="รายการสินค้า", value=rewards, inline=False)
             embed.add_field(name="ราคา", value=f"{self.price:,} IDS Coin", inline=True)
