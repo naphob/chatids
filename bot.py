@@ -8,6 +8,7 @@ from cogs.giveaways import MyView
 from cogs.shops import ShopView
 
 console = Console()
+console = Console()
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.all()
@@ -20,6 +21,7 @@ cogs_list = [
     'shops'
 ]
 
+@bot.event
 @bot.event
 async def on_ready():
         console.log(f'{bot.user.name} has connected to Discord!')
@@ -34,5 +36,8 @@ async def on_ready():
 
 for cog in cogs_list:
     bot.load_extension(f'cogs.{cog}')
+for cog in cogs_list:
+    bot.load_extension(f'cogs.{cog}')
 
+bot.run(TOKEN)
 bot.run(TOKEN)
