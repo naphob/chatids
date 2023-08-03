@@ -22,7 +22,7 @@ class Coins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def add_coin(self, user, amount,source):
+    async def mint_coin(self, user, amount, source):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         coin = amount
         if not user.bot:
@@ -35,27 +35,54 @@ class Coins(commands.Cog):
             'coin' : coin
             })
 
+    async def check_coin(self, user):
+        if ref.child(f"{user.id}") is not None:
+            coin = ref.child(f"{user.id}").child('coin').get()
+            return coin
+        else:
+            return 0
+
+    async def add_coin(self, user, amount):
+        user_amount = await self.check_coin(user)
+        if amount > 0:
+            remaining_amount = user_amount + amount
+            ref.child(f"{user.id}").set({
+                'coin' : remaining_amount
+                })
+            return remaining_amount
+
+    async def deduct_coin(self, user, amount):
+        user_amount = await self.check_coin(user)
+        if user_amount >= amount and amount > 0:
+            remaining_amount = user_amount - amount
+            print(user_amount)
+            ref.child(f"{user.id}").set({
+                'coin' : remaining_amount
+                })
+            return remaining_amount
+
     @commands.Cog.listener()
     async def on_message(self, message):
         # bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
         user = message.author
         coin = random.random()
         if message.type == discord.MessageType.premium_guild_subscription:
-            await self.add_coin(user, 150.0,"boosting the server")
+            await self.mint_coin(user, 150.0,"boosting the server")
         elif user.id != self.bot.user.id or not message.content.startswith('!'):
-            await self.add_coin(user, coin,"new message")
+            await self.mint_coin(user, coin,"new message")
         # await self.bot.process_commands(message)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         user = payload.member
         coin = random.random()
-        await self.add_coin(user, coin, "reaction")
+        await self.mint_coin(user, coin, "reaction")
 
     @bridge.bridge_command(name="balance", help="This command will return coins balance")
     async def balance(self, ctx):
         user = ctx.author
-        coin = ref.child(f"{user.id}").child('coin').get()
+        coin = await self.check_coin(user)
+        # coin = ref.child(f"{user.id}").child('coin').get()
         embed = discord.Embed(
             color=discord.Color.dark_purple(),
             description= f"Balance: `{coin}`",
@@ -74,21 +101,11 @@ class Coins(commands.Cog):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         sender = ctx.author
         receiver = user
-        sender_coin = ref.child(f"{sender.id}").child('coin').get()
-        receiver_coin = ref.child(f"{receiver.id}").child('coin').get()
-        if sender_coin >= amount:
-            remaining_coin = sender_coin - amount
-            if receiver_coin:
-                received_coin = receiver_coin + amount
-            else:
-                received_coin = amount
-            ref.child(f"{sender.id}").set({
-            'coin' : remaining_coin
-            })
-            ref.child(f"{receiver.id}").set({
-            'coin' : received_coin
-            })
-
+        # sender_coin = await self.check_coin(sender) #ref.child(f"{sender.id}").child('coin').get()
+        # receiver_coin = await self.check_coin(receiver) #ref.child(f"{receiver.id}").child('coin').get()
+        if amount > 0:
+            await self.deduct_coin(sender, amount)
+            await self.add_coin(receiver, amount)
             embed = discord.Embed(
             color=discord.Color.dark_purple(),
             title= f"Bank of IDS",
@@ -104,7 +121,7 @@ class Coins(commands.Cog):
             await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
             console.log(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
         else:
-            await ctx.respond("Insufficient IDS coin balance")
+            await ctx.respond("Insufficient IDS coin balance or wrong amount")
 
     @bridge.bridge_command(name="rank", help="This command show richest users ranking")
     async def rank(self, ctx):

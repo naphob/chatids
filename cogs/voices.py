@@ -83,7 +83,7 @@ class Voices(commands.Cog):
             await self.noti(member, after, message)
             coins = self.bot.get_cog('Coins')
             coin = random.random()
-            await coins.add_coin(member, coin, "joining vc")
+            await coins.mint_coin(member, coin, "joining vc")
         elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot:
             # A user moved to another voice channel
             message = 'ย้ายมาในห้องนี้แล้ว'

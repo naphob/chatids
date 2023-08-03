@@ -6,20 +6,14 @@ from rich.console import Console
 console = Console()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
 recipients = []
-reward_pool = [
-    'coin', 'coin', 'nitro', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin',
-    'coin', 'coin', 'star citizen', 'coin', 'coin', 'coin', 'coin', 'coin','coin',
-    'coin', 'coin', 'star citizen', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin',
-    'coin', 'coin', 'nitro', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin',
-    'coin', 'coin', 'nitro', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin', 'coin'
-]
+reward_pool = []
 
 class MyView(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=False)
+    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=True)
     async def button_callback(self, button, interaction):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         user = interaction.user
@@ -36,12 +30,12 @@ class MyView(discord.ui.View):
         else:
             result = self.reward_random()
             if result == 'coin':
-                await coins.add_coin(user, coin, "giveaway")
+                await coins.mint_coin(user, coin, "giveaway")
                 rewards = f"`{coin} IDS Coins`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
                 await interaction.response.send_message(embed=embed, ephemeral = True)
             elif result == 'star citizen':
-                await coins.add_coin(user, coin, "giveaway")
+                await coins.mint_coin(user, coin, "giveaway")
                 rewards = f"1. `{coin} IDS Coins`\n2. `Star Citizen Gift Card มูลค่า $10`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
                 embed.set_image(url="https://robertsspaceindustries.com/media/kh65mcqfdj5j0r/slideshow/GiftCard_10Dollars_FINAL-1-Min.png")
@@ -49,7 +43,7 @@ class MyView(discord.ui.View):
                 await channel.send(f"<@{user.id}> got Star Citizen gift card from giveaway")
                 console.log(f"{user.display_name} got Star Citizen gift card from giveaway")
             elif result == 'nitro':
-                await coins.add_coin(user, coin, "giveaway")
+                await coins.mint_coin(user, coin, "giveaway")
                 with open("nitro.txt", "r") as f:
                     lines = f.readlines()
                     nitro = lines[0]

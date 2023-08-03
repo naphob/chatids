@@ -5,6 +5,7 @@ from discord.ext import bridge
 from rich.console import Console
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
+from cogs.shops import ShopView
 
 console = Console()
 load_dotenv()
@@ -15,7 +16,8 @@ cogs_list = [
     'welcomes',
     'voices',
     'coins',
-    'giveaways'
+    'giveaways',
+    'shops'
 ]
 
 @bot.event
@@ -24,6 +26,7 @@ async def on_ready():
         bot.add_view(Roles())
         bot.add_view(GetRoles())
         bot.add_view(MyView(bot))
+        bot.add_view(ShopView(bot, 1500))
         await bot.change_presence(activity=discord.Game(name="Star Citizen"))
         for guild in bot.guilds:
             # PRINT THE SERVER'S ID AND NAME.
