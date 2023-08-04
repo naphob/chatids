@@ -82,7 +82,6 @@ class Coins(commands.Cog):
     async def balance(self, ctx):
         user = ctx.author
         coin = await self.check_coin(user)
-        # coin = ref.child(f"{user.id}").child('coin').get()
         embed = discord.Embed(
             color=discord.Color.dark_purple(),
             description= f"Balance: `{coin}`",
