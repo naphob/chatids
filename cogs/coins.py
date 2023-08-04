@@ -55,7 +55,6 @@ class Coins(commands.Cog):
         user_amount = await self.check_coin(user)
         if user_amount >= amount and amount > 0:
             remaining_amount = user_amount - amount
-            print(user_amount)
             ref.child(f"{user.id}").set({
                 'coin' : remaining_amount
                 })

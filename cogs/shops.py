@@ -37,11 +37,12 @@ class ShopView(discord.ui.View):
             overwrites = {
                 guild.default_role: discord.PermissionOverwrite(read_messages=False),
                 guild.me: discord.PermissionOverwrite(read_messages=True, view_channel=True),
-                guild.get_member(user.id): discord.PermissionOverwrite(read_messages=True, view_channel=True)
+                guild.get_member(user.id): discord.PermissionOverwrite(read_messages=True, view_channel=True),
+                guild.get_member(855426672806199336): discord.PermissionOverwrite(read_messages=True, view_channel=True)
             }
             category_name = 'IDS-SHOP'
             category = discord.utils.get(guild.categories, name=category_name)
-            text_channel = await guild.create_text_channel(channel_name, position=0, overwrites=overwrites, category=category)
+            text_channel = await guild.create_text_channel(channel_name, position=1, overwrites=overwrites, category=category)
             await text_channel.send("คุณจะได้รับ Discord Nitro Gift Card 1 Month ภายใน 24 ชั่วโมงในห้องรับสินค้าที่ถูกสร้างขึ้นใหม่ หากมีข้อสงสัยให้ทิ้งข้อความไว้ให้แอดมินช่วยเหลือต่อไป")
 
             embed.add_field(name="รายการสินค้า", value=rewards, inline=False)

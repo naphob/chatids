@@ -27,7 +27,7 @@ async def on_ready():
         bot.add_view(Roles())
         bot.add_view(GetRoles())
         bot.add_view(MyView(bot))
-        bot.add_view(ShopView(bot, 1500))
+        bot.add_view(ShopView(bot, 1))
         await bot.change_presence(activity=discord.Game(name="Star Citizen"))
         for guild in bot.guilds:
             # PRINT THE SERVER'S ID AND NAME.
