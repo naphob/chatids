@@ -49,8 +49,8 @@ class ShopView(discord.ui.View):
             embed.add_field(name="ราคา", value=f"{self.price:,} IDS Coin", inline=True)
             embed.add_field(name="IDS Coin ที่เหลืออยู่", value=f"{remaining}", inline=True)
             await interaction.response.send_message(f"ขอบคุณที่อุดหนุน IDS Shop คุณจะได้รับสินค้าภายใน 24 ชั่วโมงในห้อง <#{text_channel.id}> ที่ถูกสร้างขึ้นใหม่", ephemeral = True)
-            await channel.send(f"<@{user.id}> brought Nitro from IDS Shop")
-            console.log(f"{user.display_name} brought Nitro from IDS Shop")
+            await channel.send(f"<@{user.id}> bought Nitro from IDS Shop")
+            console.log(f"{user.display_name} bought Nitro from IDS Shop")
         else:
             await interaction.response.send_message("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
