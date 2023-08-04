@@ -19,11 +19,7 @@ class ShopView(discord.ui.View):
         coins = self.bot.get_cog('Coins')
         user = interaction.user
         user_coin = await coins.check_coin(user)
-        with open("nitro.txt", "r") as f:
-            lines = f.readlines()
-            nitro = lines[0]
-            stock = len(lines)
-        if user_coin >= self.price and stock > 0:
+        if user_coin >= self.price:
             remaining = await coins.deduct_coin(user, self.price)
             embed = discord.Embed(
             title = "Discord Nitro 1 Month",
