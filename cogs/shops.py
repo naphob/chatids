@@ -31,7 +31,7 @@ class NitroView(discord.ui.View):
         self.price = price
 
     @discord.ui.button(label="Buy", custom_id="buy", style=discord.ButtonStyle.blurple, emoji="🪙", disabled=False)
-    async def button_callback(self, button, interaction):
+    async def nitro_button_callback(self, button, interaction):
         global room_number
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         coins = self.bot.get_cog('Coins')
@@ -112,7 +112,7 @@ class ShipView(discord.ui.View):
             await coins.deduct_coin(user, self.price)
 
             room_number += 1
-            channel_name = f"{room_number}-รับสินค้า"
+            channel_name = f"{user.name}-{room_number}-รับสินค้า"
             guild = await discord.utils.get_or_fetch(self.bot, 'guild', 1004082951753052232)
             overwrites = {
                 guild.default_role: discord.PermissionOverwrite(read_messages=False, view_channel=False),
@@ -165,63 +165,62 @@ class Shops(commands.Cog):
         else:
             await ctx.respond("You don't have permissioin to run this command.", ephemeral=True)
 
-    @bridge.bridge_command(name="page")
-    async def page(self, ctx: discord.ApplicationContext):
-        """Demonstrates using the paginator with the default options."""
-        sale_page = []
-        embed = discord.Embed(
-                    title="Discord Nitro 1 Month",
-                    description="ใช้ดิสดอร์ดไนโตรได้ 1 เดือน ซื้อแล้วอย่าลืมบูสเพชรให้กับ IDS ด้วยนะ",
-                    color=discord.Color.dark_purple()
-                )
-        embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
-        embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
-        embed.set_thumbnail(url="https://static-00.iconduck.com/assets.00/discord-icon-512x511-blfje7wy.png")
-        embed.add_field(name="Price", value=f"~~3,499~~ **1,500** IDS Coin")
+    # @bridge.bridge_command(name="page")
+    # async def page(self, ctx: discord.ApplicationContext):
+    #     sale_page = []
+    #     embed = discord.Embed(
+    #                 title="Discord Nitro 1 Month",
+    #                 description="ใช้ดิสดอร์ดไนโตรได้ 1 เดือน ซื้อแล้วอย่าลืมบูสเพชรให้กับ IDS ด้วยนะ",
+    #                 color=discord.Color.dark_purple()
+    #             )
+    #     embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
+    #     embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
+    #     embed.set_thumbnail(url="https://static-00.iconduck.com/assets.00/discord-icon-512x511-blfje7wy.png")
+    #     embed.add_field(name="Price", value=f"~~3,499~~ **1,500** IDS Coin")
 
-        embed2 = discord.Embed(
-                    title="Star Citizen $10 Gift Card",
-                    description="ใช้สำหรับซื้่อของในเกม Star Citizen",
-                    color=discord.Color.dark_blue()
-                )
-        embed2.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
-        embed2.set_image(url="https://robertsspaceindustries.com/media/kh65mcqfdj5j0r/slideshow/GiftCard_10Dollars_FINAL-1-Min.png")
-        embed2.set_thumbnail(url="https://cdn.icon-icons.com/icons2/2407/PNG/512/star_citizen_icon_146095.png")
-        embed2.add_field(name="Price", value=f"~~3,499~~ **1,500** IDS Coin")
+    #     embed2 = discord.Embed(
+    #                 title="Star Citizen $10 Gift Card",
+    #                 description="ใช้สำหรับซื้่อของในเกม Star Citizen",
+    #                 color=discord.Color.dark_blue()
+    #             )
+    #     embed2.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
+    #     embed2.set_image(url="https://robertsspaceindustries.com/media/kh65mcqfdj5j0r/slideshow/GiftCard_10Dollars_FINAL-1-Min.png")
+    #     embed2.set_thumbnail(url="https://cdn.icon-icons.com/icons2/2407/PNG/512/star_citizen_icon_146095.png")
+    #     embed2.add_field(name="Price", value=f"~~3,499~~ **1,500** IDS Coin")
 
-        embed3 = discord.Embed(
-                    title="MUSTANG ALPHA STARTER PACK",
-                    description="ตัวเกม Star Citizen พร้อมยาน MUSTANG ALPHA",
-                    color=discord.Color.dark_blue()
-                )
-        embed3.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
-        embed3.set_image(url="https://media.robertsspaceindustries.com/hq53y1xaq86zn/slideshow.png")
-        embed3.set_thumbnail(url="https://cdn.icon-icons.com/icons2/2407/PNG/512/star_citizen_icon_146095.png")
-        embed3.add_field(name="Price", value=f"15,000 IDS Coin")
+    #     embed3 = discord.Embed(
+    #                 title="MUSTANG ALPHA STARTER PACK",
+    #                 description="ตัวเกม Star Citizen พร้อมยาน MUSTANG ALPHA มูลค่า $45",
+    #                 color=discord.Color.dark_blue()
+    #             )
+    #     embed3.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
+    #     embed3.set_image(url="https://media.robertsspaceindustries.com/hq53y1xaq86zn/slideshow.png")
+    #     embed3.set_thumbnail(url="https://cdn.icon-icons.com/icons2/2407/PNG/512/star_citizen_icon_146095.png")
+    #     embed3.add_field(name="Price", value=f"15,000 IDS Coin")
 
-        page = pages.Page(
-                embeds=[embed],
-                custom_view=NitroView(self.bot, 1500)
-            )
-        page2 = pages.Page(
-                embeds=[embed2],
-                custom_view=GiftCardView(self.bot, 1500)
-            )
-        page3 = pages.Page(
-                embeds=[embed3],
-                custom_view=ShipView(self.bot, 15000)
-            )
+    #     page = pages.Page(
+    #             embeds=[embed],
+    #             custom_view=NitroView(self.bot, 1500)
+    #         )
+    #     page2 = pages.Page(
+    #             embeds=[embed2],
+    #             custom_view=GiftCardView(self.bot, 1500)
+    #         )
+    #     page3 = pages.Page(
+    #             embeds=[embed3],
+    #             custom_view=ShipView(self.bot, 15000)
+    #         )
 
-        sale_page.append(page)
-        sale_page.append(page2)
-        sale_page.append(page3)
+    #     sale_page.append(page)
+    #     sale_page.append(page2)
+    #     sale_page.append(page3)
 
+    #     custom_buttons = PaginatorView.get_buttons()
+    #     paginator = pages.Paginator(pages=sale_page)
+    #     paginator.remove_button("first")
+    #     paginator.remove_button("last")
 
-        paginator = pages.Paginator(pages=sale_page)
-        paginator.remove_button("first")
-        paginator.remove_button("last")
-
-        await paginator.send(ctx)
+    #     await paginator.send(ctx)
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Shops(bot)) # add the cog to the bot

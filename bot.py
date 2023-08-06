@@ -6,6 +6,7 @@ from rich.console import Console
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
 from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
+from cogs.casinos import RandomView
 
 console = Console()
 console = Console()
@@ -18,7 +19,8 @@ cogs_list = [
     'voices',
     'coins',
     'giveaways',
-    'shops'
+    'shops',
+    'casinos'
 ]
 
 @bot.event
@@ -32,6 +34,7 @@ async def on_ready():
         bot.add_view(GiftCardView(bot, 1500))
         bot.add_view(ShipView(bot, 1500))
         bot.add_view(PaginatorView())
+        bot.add_view(RandomView(bot))
 
         await bot.change_presence(activity=discord.Game(name="Star Citizen"))
         for guild in bot.guilds:
