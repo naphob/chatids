@@ -5,7 +5,7 @@ from discord.ext import bridge
 from rich.console import Console
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
-from cogs.shops import ShopView
+from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
 
 console = Console()
 console = Console()
@@ -24,10 +24,15 @@ cogs_list = [
 @bot.event
 async def on_ready():
         console.log(f'{bot.user.name} has connected to Discord!')
+
         bot.add_view(Roles())
         bot.add_view(GetRoles())
         bot.add_view(MyView(bot))
-        bot.add_view(ShopView(bot, 1500))
+        bot.add_view(NitroView(bot, 1500))
+        bot.add_view(GiftCardView(bot, 1500))
+        bot.add_view(ShipView(bot, 1500))
+        bot.add_view(PaginatorView())
+
         await bot.change_presence(activity=discord.Game(name="Star Citizen"))
         for guild in bot.guilds:
             # PRINT THE SERVER'S ID AND NAME.
