@@ -83,14 +83,14 @@ class Coins(commands.Cog):
         coin = await self.check_coin(user)
         embed = discord.Embed(
             color=discord.Color.dark_purple(),
-            description= f"Balance: `{coin}`",
+            description= f"Balance: `{coin:,.2f}`",
             title= f"{user.display_name}'s Wallet"
         )
         embed.set_author(name="Bank of IDS")
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
             await ctx.respond(embed=embed)
-            console.log(f"{user.display_name}'s balance: {coin} IDS Coins.")
+            console.log(f"{user.display_name}'s balance: {coin:,.2f} IDS Coins.")
         else:
             await ctx.respond("You have no IDS coins")
 
@@ -145,7 +145,7 @@ class Coins(commands.Cog):
                 rank =":third_place:"
             else:
                 rank = rank+1
-            names += f"{rank} <@{user}> : {leaderboard[user]} :coin:\n"
+            names += f"{rank} <@{user}> : {leaderboard[user]:,.2f} :coin:\n"
         embed.add_field(name="Names", value=names, inline=False)
         await ctx.respond(embed=embed)
 

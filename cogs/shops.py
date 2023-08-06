@@ -111,20 +111,31 @@ class ShipView(discord.ui.View):
         if user_coin >= self.price:
             await coins.deduct_coin(user, self.price)
 
-            room_number += 1
-            channel_name = f"{user.name}-{room_number}-รับสินค้า"
-            guild = await discord.utils.get_or_fetch(self.bot, 'guild', 1004082951753052232)
-            overwrites = {
-                guild.default_role: discord.PermissionOverwrite(read_messages=False, view_channel=False),
-                guild.me: discord.PermissionOverwrite(read_messages=True, view_channel=True),
-                guild.get_member(user.id): discord.PermissionOverwrite(read_messages=True, view_channel=True),
-                guild.get_member(855426672806199336): discord.PermissionOverwrite(read_messages=True, view_channel=True)
-            }
-            category_name = 'IDS-SHOP'
-            category = discord.utils.get(guild.categories, name=category_name)
-            text_channel = await guild.create_text_channel(channel_name, position=1, overwrites=overwrites, category=category)
-            await text_channel.send("คุณจะได้รับ MUSTANG ALPHA STARTER PACK ภายใน 24 ชั่วโมงในห้องรับสินค้าที่ถูกสร้างขึ้นใหม่ หากมีข้อสงสัยให้ทิ้งข้อความไว้ให้แอดมินช่วยเหลือต่อไป")
-            await interaction.response.send_message(f"ขอบคุณที่อุดหนุน IDS Shop คุณจะได้รับสินค้าภายใน 24 ชั่วโมงในห้อง <#{text_channel.id}> ที่ถูกสร้างขึ้นใหม่", ephemeral = True)
+            # room_number += 1
+            # channel_name = f"{user.name}-{room_number}-รับสินค้า"
+            # guild = await discord.utils.get_or_fetch(self.bot, 'guild', 1004082951753052232)
+            # overwrites = {
+            #     guild.default_role: discord.PermissionOverwrite(read_messages=False, view_channel=False),
+            #     guild.me: discord.PermissionOverwrite(read_messages=True, view_channel=True),
+            #     guild.get_member(user.id): discord.PermissionOverwrite(read_messages=True, view_channel=True),
+            #     guild.get_member(855426672806199336): discord.PermissionOverwrite(read_messages=True, view_channel=True)
+            # }
+            # category_name = 'IDS-SHOP'
+            # category = discord.utils.get(guild.categories, name=category_name)
+            # text_channel = await guild.create_text_channel(channel_name, position=1, overwrites=overwrites, category=category)
+            # await text_channel.send("คุณจะได้รับ MUSTANG ALPHA STARTER PACK ภายใน 24 ชั่วโมงในห้องรับสินค้าที่ถูกสร้างขึ้นใหม่ หากมีข้อสงสัยให้ทิ้งข้อความไว้ให้แอดมินช่วยเหลือต่อไป")
+
+            embed = discord.Embed(
+            title="Discord Nitro 1 Month",
+            description="ใช้ดิสดอร์ดไนโตรได้ 1 เดือน ซื้อแล้วอย่าลืมบูสเพชรให้กับ IDS ด้วยนะ",
+            color=discord.Color.dark_purple()
+            )
+            embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
+            embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
+            embed.set_thumbnail(url="https://static-00.iconduck.com/assets.00/discord-icon-512x511-blfje7wy.png")
+            embed.set_footer(text="น้อนจะส่งลิงค์เพื่อใช้ไนโตรภายใน 24 ชั่วโมงถึงคุณในแชทส่วนตัวของคุณ")
+
+            await interaction.response.send_message(embed=embed, ephemeral = True)
             await channel.send(f"<@{user.id}> bought MUSTANG ALPHA STARTER PACK from IDS Shop")
             console.log(f"{user.display_name} bought MUSTANG ALPHA STARTER PACK from IDS Shop")
         else:
