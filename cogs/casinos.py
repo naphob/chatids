@@ -21,13 +21,13 @@ class RandomView(discord.ui.View):
         user_balace = await coins.check_coin(user)
         await coins.deduct_coin(user, 1)
         if result[0] == result[1] and result[0] == result[2]:
-            rewards = 200000
+            rewards = 100000
             await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[1] == result[2]:
             rewards = 100
             await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[0] == result[2]:
-            rewards = 1500
+            rewards = 1000
             await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
             rewards= 1000000
@@ -69,7 +69,7 @@ class Casinos(commands.Cog):
             title="Slot Machine",
             description="โยกสล็อตแมตชีนลุ้นรางวัลสูงสุด 10,000 IDS Coin"
         )
-        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,500` IDS Coin\n🍎🍎🍎  `200,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
+        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `100,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
         fee="`1` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.add_field(name="Example", value= example)
