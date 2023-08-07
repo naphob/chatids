@@ -19,15 +19,19 @@ class RandomView(discord.ui.View):
         slot_result = f"{result[0]} {result[1]} {result[2]}"
         coins = self.bot.get_cog('Coins')
         user_balace = await coins.check_coin(user)
-        await coins.deduct_coin(user, 10)
+        await coins.deduct_coin(user, 1)
         if result[0] == result[1] and result[0] == result[2]:
-            await coins.mint_coin(user, 10000, "slot machine")
+            rewards = 50000
+            await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[1] == result[2]:
-            await coins.mint_coin(user, 25, "slot machine")
+            rewards = 500
+            await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[0] == result[2]:
-            await coins.mint_coin(user, 100, "slot machine")
+            rewards = 1500
+            await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
-            await coins.mint_coin(user, 1000000, "slot machine")
+            rewards= 1000000
+            await coins.mint_coin(user, rewards, "slot machine")
         else:
             rewards = 0
 
@@ -65,11 +69,12 @@ class Casinos(commands.Cog):
             title="Slot Machine",
             description="โยกสล็อตแมตชีนลุ้นรางวัลสูงสุด 10,000 IDS Coin"
         )
-        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `25` IDS Coin\n🍎🍌🍎  `100` IDS Coin\n🍎🍎🍎  `10,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
-        fee="`10` IDS Coin"
+        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `500` IDS Coin\n🍎🍌🍎  `1500` IDS Coin\n🍎🍎🍎  `50,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
+        fee="`1` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.add_field(name="Example", value= example)
         embed.add_field(name="Fee", value= fee)
+        embed.set_footer(text="การพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนโยก")
         view = RandomView(self.bot)
         await ctx.respond(embed=embed, view=view)
 
