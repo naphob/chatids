@@ -19,7 +19,7 @@ class RandomView(discord.ui.View):
         slot_result = f"{result[0]} {result[1]} {result[2]}"
         coins = self.bot.get_cog('Coins')
         user_balace = await coins.check_coin(user)
-        await coins.deduct_coin(user, 1)
+        await coins.deduct_coin(user, 10)
         if result[0] == result[1] and result[0] == result[2]:
             rewards = 100000
             await coins.mint_coin(user, rewards, "slot machine")
@@ -70,7 +70,7 @@ class Casinos(commands.Cog):
             description="โยกสล็อตแมตชีนลุ้นรางวัลสูงสุด 10,000 IDS Coin"
         )
         example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `100,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
-        fee="`1` 🪙"
+        fee="`10` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.add_field(name="Example", value= example)
         embed.add_field(name="Fee", value= fee)
