@@ -147,19 +147,21 @@ class Shops(commands.Cog):
 
     @bridge.bridge_command(name="shop", help="show item shop")
     async def shop(self, ctx):
-        embed = discord.Embed(
-            title="Discord Nitro 1 Month",
-            description="ใช้ดิสดอร์ดไนโตรได้ 1 เดือน ซื้อแล้วอย่าลืมบูสเพชรให้กับ IDS ด้วยนะ",
-            color=discord.Color.dark_purple()
-        )
-        price = 1500
-        embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
-        embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
-        embed.set_thumbnail(url="https://static-00.iconduck.com/assets.00/discord-icon-512x511-blfje7wy.png")
-        embed.add_field(name="Price", value=f"~~3,499~~ **{price:,}** IDS Coin")
-        view= NitroView(self.bot, price)
-        await ctx.send(embed=embed, view=view)
-
+        if ctx.author.id == 855426672806199336:
+            embed = discord.Embed(
+                title="Discord Nitro 1 Month",
+                description="ใช้ดิสดอร์ดไนโตรได้ 1 เดือน ซื้อแล้วอย่าลืมบูสเพชรให้กับ IDS ด้วยนะ",
+                color=discord.Color.dark_purple()
+            )
+            price = 1500
+            embed.set_author(name="IDS Shop", icon_url="https://cdn-icons-png.flaticon.com/512/3900/3900101.png")
+            embed.set_image(url="https://cdn.vcgamers.com/news/wp-content/uploads/2021/06/discord-nitro-1144x430.png")
+            embed.set_thumbnail(url="https://static-00.iconduck.com/assets.00/discord-icon-512x511-blfje7wy.png")
+            embed.add_field(name="Price", value=f"~~3,499~~ **{price:,}** IDS Coin")
+            view= NitroView(self.bot, price)
+            await ctx.send(embed=embed, view=view)
+        else:
+            await ctx.respond("You don't have permissioin to run this command.", ephemeral=True)
 
     @bridge.bridge_command(name="nitro", help="send item to buyer")
     async def nitro(self, ctx, url, channel : discord.TextChannel):
