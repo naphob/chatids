@@ -18,7 +18,7 @@ class RandomView(discord.ui.View):
         )
         slot_result = f"{result[0]} {result[1]} {result[2]}"
         coins = self.bot.get_cog('Coins')
-        user_balace = await coins.check_coin(user)
+        user_balance = await coins.check_coin(user)
         await coins.deduct_coin(user, 10)
         if result[0] == result[1] and result[0] == result[2]:
             rewards = 50000
@@ -37,7 +37,7 @@ class RandomView(discord.ui.View):
 
         embed.add_field(name="Result", value=slot_result, inline=False)
         embed.add_field(name="Player", value=user.display_name, inline=False)
-        embed.add_field(name="Balance", value=f"`{user_balace:,.2f}`", inline=True)
+        embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
         embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
 
         await interaction.response.send_message(embed=embed, ephemeral = True)

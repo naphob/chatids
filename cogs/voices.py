@@ -126,20 +126,32 @@ class Voices(commands.Cog):
         """
         Command to play voice message in the user's current voice channel
         """
+        coins = self.bot.get_cog('Coins')
         user = ctx.message.author
-        username = user.display_name.split('[')
-        message = f'{username[0]} พูดว่า {args}'
-        err_msg = 'You are not in a voice channel.'
-        await self.tts_vc(ctx, user, message, err_msg)
-
+        user_balance = await coins.check_coin(user)
+        if user_balance >= 10.0:
+            await coins.deduct_coin(user, 10)
+            username = user.display_name.split('[')
+            message = f'{username[0]} พูดว่า {args}'
+            err_msg = 'You are not in a voice channel.'
+            await self.tts_vc(ctx, user, message, err_msg)
+            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+        else:
+            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
     @bridge.bridge_command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
     async def send(self, ctx, member: discord.Member, *args):
+        coins = self.bot.get_cog('Coins')
         user = ctx.message.author
-        username = user.display_name.split('[')
-        message = f'{username[0]} ฝากบอกว่า {args}'
-        err_msg = 'Receiver is not in a voice channel.'
-        await self.tts_vc(ctx, member, message, err_msg)
+        user_balance = await coins.check_coin(user)
+        if user_balance >= 10.0:
+            username = user.display_name.split('[')
+            message = f'{username[0]} ฝากบอกว่า {args}'
+            err_msg = 'Receiver is not in a voice channel.'
+            await self.tts_vc(ctx, member, message, err_msg)
+            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+        else:
+            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
     @bridge.bridge_command(name="rec", help="This command will record your voice message then send it to targeted user after stop recording")
     async def rec(self, ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
