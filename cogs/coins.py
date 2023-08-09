@@ -14,7 +14,10 @@ credential = os.getenv("FIREBASE_CREDENTIALS")
 DB_URL = os.getenv("DB_URL")
 cred = credentials.Certificate(credential)
 firebase_admin.initialize_app(cred, {
-    'databaseURL': DB_URL
+    'databaseURL': DB_URL,
+    'databaseAuthVariableOverride' : {
+        'uid' : 'ids-bot'
+    }
 })
 ref = db.reference('users')
 
