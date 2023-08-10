@@ -20,7 +20,10 @@ class RandomView(discord.ui.View):
         coins = self.bot.get_cog('Coins')
         user_balance = await coins.check_coin(user)
         await coins.deduct_coin(user, 10)
-        if result[0] == result[1] and result[0] == result[2]:
+        if result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
+            rewards= 1000000
+            await coins.mint_coin(user, rewards, "slot machine")
+        elif result[0] == result[1] and result[0] == result[2]:
             rewards = 50000
             await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[1] == result[2]:
@@ -28,9 +31,6 @@ class RandomView(discord.ui.View):
             await coins.mint_coin(user, rewards, "slot machine")
         elif result[0] == result[1] or result[0] == result[2]:
             rewards = 1000
-            await coins.mint_coin(user, rewards, "slot machine")
-        elif result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
-            rewards= 1000000
             await coins.mint_coin(user, rewards, "slot machine")
         else:
             rewards = 0
