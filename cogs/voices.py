@@ -51,7 +51,6 @@ class Voices(commands.Cog):
 
     async def tts_vc(self, ctx, user, message, err_msg):
         if user.voice is not None:
-            # put new tts message to queue
             q.put(message)
             try:
                 vc = await user.voice.channel.connect()

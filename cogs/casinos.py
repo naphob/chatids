@@ -1,7 +1,12 @@
 import discord
 import random
+from datetime import date
 from rich.console import Console
 from discord.ext import commands, bridge
+
+
+console = Console()
+quota = {}
 
 class RandomView(discord.ui.View):
     def __init__(self, bot):
@@ -10,37 +15,42 @@ class RandomView(discord.ui.View):
 
     @discord.ui.button(label="โยก", custom_id="buy", style=discord.ButtonStyle.blurple, emoji="🕹️")
     async def slot_button_callback(self, button, interaction):
-        result = self.random_slot()
         user = interaction.user
-        embed = discord.Embed(
-            title="Slot Machine",
-            color=discord.Color.dark_orange()
-        )
-        slot_result = f"{result[0]} {result[1]} {result[2]}"
-        coins = self.bot.get_cog('Coins')
-        user_balance = await coins.check_coin(user)
-        await coins.deduct_coin(user, 10)
-        if result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
-            rewards= 1000000
-            await coins.mint_coin(user, rewards, "slot machine")
-        elif result[0] == result[1] and result[0] == result[2]:
-            rewards = 50000
-            await coins.mint_coin(user, rewards, "slot machine")
-        elif result[0] == result[1] or result[1] == result[2]:
-            rewards = 100
-            await coins.mint_coin(user, rewards, "slot machine")
-        elif result[0] == result[1] or result[0] == result[2]:
-            rewards = 1000
-            await coins.mint_coin(user, rewards, "slot machine")
+        quota_count = self.quota_check(user)
+        if quota_count == True:
+            result = self.random_slot()
+            embed = discord.Embed(
+                title="Slot Machine",
+                color=discord.Color.dark_orange()
+            )
+            slot_result = f"{result[0]} {result[1]} {result[2]}"
+            console.log(f"{user.display_name} : {slot_result}")
+            coins = self.bot.get_cog('Coins')
+            user_balance = await coins.check_coin(user)
+            await coins.deduct_coin(user, 10)
+            if result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
+                rewards= 1000000
+                await coins.mint_coin(user, rewards, "slot machine")
+            elif result[0] == result[1] and result[0] == result[2]:
+                rewards = 50000
+                await coins.mint_coin(user, rewards, "slot machine")
+            elif result[0] == result[1] or result[1] == result[2]:
+                rewards = 100
+                await coins.mint_coin(user, rewards, "slot machine")
+            elif result[0] == result[1] or result[0] == result[2]:
+                rewards = 1000
+                await coins.mint_coin(user, rewards, "slot machine")
+            else:
+                rewards = 0
+
+            embed.add_field(name="Result", value=slot_result, inline=False)
+            embed.add_field(name="Player", value=user.display_name, inline=False)
+            embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
+            embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
+
+            await interaction.response.send_message(embed=embed, ephemeral = True)
         else:
-            rewards = 0
-
-        embed.add_field(name="Result", value=slot_result, inline=False)
-        embed.add_field(name="Player", value=user.display_name, inline=False)
-        embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
-        embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
-
-        await interaction.response.send_message(embed=embed, ephemeral = True)
+            await interaction.response.send_message("คุณโยกสล็อตเกินโควต้าต่อวันแล้ว", ephemeral = True)
 
     def random_slot(self):
         self.items = [
@@ -56,8 +66,23 @@ class RandomView(discord.ui.View):
                     "🍕", "7️⃣"
                 ]
         result = random.choices(self.items, k=3)
-        print(result)
         return result
+
+    def quota_check(self, user):
+        if user not in quota:
+            quota[user] = {}
+            quota[user]['date'] = date.today()
+            quota[user]['count'] = quota[user].get('count', 0) + 1
+            # print(f"{user}: {quota[user]['count']}")
+            return True
+        elif quota[user]['date'] == date.today() and quota[user]['count'] <= 10:
+            quota[user]['count'] = quota[user].get('count', 0) + 1
+            # print(f"{user}: {quota[user]['count']}")
+            return True
+        elif quota[user]['count'] > 10:
+            # print(f"{user}: {quota[user]['count']}")
+            return False
+
 
 class Casinos(commands.Cog):
     def __init__(self, bot):
