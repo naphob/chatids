@@ -30,9 +30,6 @@ async def on_ready():
         bot.add_view(Roles())
         bot.add_view(GetRoles())
         bot.add_view(MyView(bot))
-        bot.add_view(NitroView(bot, 1500))
-        bot.add_view(GiftCardView(bot, 1500))
-        bot.add_view(ShipView(bot, 1500))
         bot.add_view(PaginatorView())
         bot.add_view(RandomView(bot))
 
