@@ -97,10 +97,10 @@ class Casinos(commands.Cog):
         example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `50,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
         fee="`10` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
-        embed.set_author(name="IDS Slot Machine", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
+        embed.set_author(name="IDS Slot Machine", icon_url="https://phoneky.co.uk/thumbs/screensavers/down/original/animatedsl_ylrdr78z.gif")
         embed.add_field(name="Example", value= example)
         embed.add_field(name="Fee", value= fee)
-        embed.set_footer(text="การพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนโยก")
+        embed.set_footer(text="การพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนโยก", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
         view = RandomView(self.bot)
         await ctx.respond(embed=embed, view=view)
 
