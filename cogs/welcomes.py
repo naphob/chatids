@@ -160,11 +160,11 @@ class Welcomes(commands.Cog):
         await member.add_roles(member.guild.get_role(role))
         await self.welcome_pic(member)
 
-    @bridge.bridge_command(name="welcome", help="Welcome new member")
+    @bridge.bridge_command(name="welcome", description="Welcome new member")
     async def welcome(self,ctx, user: discord.Member):
         await self.welcome_pic(user)
 
-    @bridge.bridge_command(name="role", help="Select a role")
+    @bridge.bridge_command(name="role", description="Select a role")
     async def role(self, ctx):
         embed = discord.Embed(
                 title = "Welcome to the verse",

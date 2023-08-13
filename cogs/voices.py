@@ -96,7 +96,7 @@ class Voices(commands.Cog):
             message = 'ออกห้องไปแล้ว'
             await self.noti(member, before, message)
 
-    @bridge.bridge_command(name='summon', help='This command will make the bot join the voice channel')
+    @bridge.bridge_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
         """
         command to join voice channel
@@ -108,7 +108,7 @@ class Voices(commands.Cog):
             channel = ctx.author.voice.channel
         await channel.connect()
 
-    @bridge.bridge_command(name='leave', help='This command will make the bot leave the voice channel')
+    @bridge.bridge_command(name='leave', description='This command will make the bot leave the voice channel')
     async def leave(self, ctx):
         """
         command to leave voice channel
@@ -120,7 +120,7 @@ class Voices(commands.Cog):
 
         await vc.disconnect()
 
-    @bridge.bridge_command(name="say", help="This command will make the bot speak what you want in the voice channel")
+    @bridge.bridge_command(name="say", description="This command will make the bot speak what you want in the voice channel")
     async def say(self, ctx, *args):
         """
         Command to play voice message in the user's current voice channel
@@ -138,7 +138,7 @@ class Voices(commands.Cog):
         else:
             await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
-    @bridge.bridge_command(name="send", help="This command will send voice message to mentioned user connected to voice channel")
+    @bridge.bridge_command(name="send", description="This command will send voice message to mentioned user connected to voice channel")
     async def send(self, ctx, member: discord.Member, *args):
         coins = self.bot.get_cog('Coins')
         user = ctx.message.author
@@ -152,7 +152,7 @@ class Voices(commands.Cog):
         else:
             await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
-    @bridge.bridge_command(name="rec", help="This command will record your voice message then send it to targeted user after stop recording")
+    @bridge.bridge_command(name="rec", description="This command will record your voice message then send it to targeted user after stop recording")
     async def rec(self, ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
         voice = ctx.author.voice
 
@@ -188,7 +188,7 @@ class Voices(commands.Cog):
             await asyncio.sleep(10)
         await vc.disconnect()
 
-    @bridge.bridge_command(name="stop_rec", help="This command will stop recording your voice message")
+    @bridge.bridge_command(name="stop_rec", description="This command will stop recording your voice message")
     async def stop_rec(self, ctx):
         if ctx.guild.id in connections:  # Check if the guild is in the cache.
             vc = connections[ctx.guild.id]

@@ -88,7 +88,7 @@ class Casinos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(name="slot", help="play slot machine")
+    @bridge.bridge_command(name="slot", description="play slot machine")
     async def slot(self, ctx):
         embed = discord.Embed(
             title="เครื่องผลิต🧂",

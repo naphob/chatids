@@ -145,7 +145,7 @@ class Shops(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(name="shop", help="show item shop")
+    @bridge.bridge_command(name="shop", description="show item shop")
     async def shop(self, ctx):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
@@ -163,7 +163,7 @@ class Shops(commands.Cog):
         else:
             await ctx.respond("You don't have permissioin to run this command.", ephemeral=True)
 
-    @bridge.bridge_command(name="nitro", help="send item to buyer")
+    @bridge.bridge_command(name="nitro", description="send item to buyer")
     async def nitro(self, ctx, url, channel : discord.TextChannel):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
