@@ -91,12 +91,13 @@ class Casinos(commands.Cog):
     @bridge.bridge_command(name="slot", help="play slot machine")
     async def slot(self, ctx):
         embed = discord.Embed(
-            title="Slot Machine",
+            title="เครื่องผลิตเกลือ",
             description="โยกสล็อตแมตชีนลุ้นรางวัลสูงสุด 1,000,000 IDS Coin"
         )
         example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `50,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
         fee="`10` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
+        embed.set_author("IDS Slot Machine", icon_url="https://downloadwap.com/thumbs3/screensavers/d/new/fun/slot_machine-40811.gif")
         embed.add_field(name="Example", value= example)
         embed.add_field(name="Fee", value= fee)
         embed.set_footer(text="การพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนโยก")
