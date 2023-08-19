@@ -81,7 +81,7 @@ class RandomView(discord.ui.View):
             return True
         elif quota[user]['date'] != date.today():
             quota[user]['date'] = date.today()
-            quota[user]['count'] = quota[user].get('count', 0) + 1
+            quota[user]['count'] = 1
             # print(f"{user}: {quota[user]['count']}")
             return True
         elif quota[user]['count'] >= 10:
