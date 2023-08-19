@@ -20,7 +20,8 @@ cogs_list = [
     'coins',
     'giveaways',
     'shops',
-    'casinos'
+    'casinos',
+    'utils'
 ]
 
 @bot.event
