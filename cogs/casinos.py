@@ -69,7 +69,7 @@ class RandomView(discord.ui.View):
                     "🍱", "🥡", "🥠", "🥟", "🍠", "🥩", "🍗", "🍖", "🥫", "🫔", "🌯",
                     "🌮", "🥪", "🥙", "🥗", "🧀", "🫓", "🥖", "🥯", "🥨", "🥐", "🍞",
                     "🥓", "🥚", "🍳", "🧇", "🥞", "🧈", "🧂", "🍿", "🌭", "🍟", "🍔",
-                    "🍕", "7️⃣"
+                    "🍕"
                 ]
         result = random.choices(items, k=3)
         return result
@@ -149,7 +149,7 @@ class Casinos(commands.Cog):
             title="เครื่องผลิต🧂",
             description="โยกสล็อตแมตชีนลุ้นรางวัลสูงสุด 1,000,000 IDS Coin"
         )
-        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `50,000` IDS Coin\n7️⃣7️⃣7️⃣ `1,000,000` IDS Coin"
+        example = "🍎🍌🍊  ไม่ได้รางวัล\n🍎🍎🍊  `100` IDS Coin\n🍎🍌🍎  `1,000` IDS Coin\n🍎🍎🍎  `50,000` IDS Coin\n🧂🧂🧂 `1,000,000` IDS Coin"
         fee="`10` 🪙"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.set_author(name="IDS Casino", icon_url="https://phoneky.co.uk/thumbs/screensavers/down/original/animatedsl_ylrdr78z.gif")
