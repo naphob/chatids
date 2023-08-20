@@ -123,7 +123,7 @@ class MyModal(discord.ui.Modal):
                     title="ไฮโล 🎲",
                     color=discord.Color.dark_orange()
                 )
-                dices = dices = {
+                dices = {
                     1:"<:dice1:1140218148109439087>",
                     2:"<:dice2:1140218191101042739>",
                     3:"<:dice3:1140218230259077172>",
