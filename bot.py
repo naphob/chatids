@@ -8,7 +8,7 @@ from firebase_admin import credentials
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
 from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
-from cogs.casinos import RandomView, MyModal
+from cogs.casinos import RandomView, DiceView
 
 console = Console()
 console = Console()
@@ -46,6 +46,7 @@ async def on_ready():
         bot.add_view(MyView(bot))
         bot.add_view(PaginatorView())
         bot.add_view(RandomView(bot))
+        bot.add_view(DiceView(bot))
 
         await bot.change_presence(activity=discord.Game(name="Star Citizen"))
         for guild in bot.guilds:
