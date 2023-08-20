@@ -1,29 +1,23 @@
-import os
 import random
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands, bridge
 from rich.console import Console
-import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import db
 
 console = Console()
 load_dotenv()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
-credential = os.getenv("FIREBASE_CREDENTIALS")
-DB_URL = os.getenv("DB_URL")
-cred = credentials.Certificate(credential)
-firebase_admin.initialize_app(cred, {
-    'databaseURL': DB_URL,
-    'databaseAuthVariableOverride' : {
-        'uid' : 'ids-bot'
-    }
-})
-ref = db.reference('users')
+
+# ref = db.reference('users')
 
 class Coins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.user = db.reference('users')
+
+    def get_user(self):
+        return self.user
 
     async def mint_coin(self, user, amount, source):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
@@ -31,16 +25,16 @@ class Coins(commands.Cog):
         if not user.bot:
             await channel.send(f"<@{user.id}> recieved {coin} IDS Coins from {source}.")
             console.log(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
-            user_coin = ref.child(f"{user.id}").child('coin').get()
+            user_coin = self.user.child(f"{user.id}").child('coin').get()
             if user_coin:
                 coin += user_coin
-            ref.child(f"{user.id}").set({
+            self.user.child(f"{user.id}").update({
             'coin' : coin
             })
 
     async def check_coin(self, user):
-        if ref.child(f"{user.id}") is not None:
-            coin = ref.child(f"{user.id}").child('coin').get()
+        if self.user.child(f"{user.id}") is not None:
+            coin = self.user.child(f"{user.id}").child('coin').get()
             return coin
         else:
             return 0
@@ -49,7 +43,7 @@ class Coins(commands.Cog):
         user_amount = await self.check_coin(user)
         if amount > 0:
             remaining_amount = user_amount + amount
-            ref.child(f"{user.id}").set({
+            self.user.child(f"{user.id}").update({
                 'coin' : remaining_amount
                 })
             return remaining_amount
@@ -58,10 +52,11 @@ class Coins(commands.Cog):
         user_amount = await self.check_coin(user)
         if user_amount >= amount and amount > 0:
             remaining_amount = user_amount - amount
-            ref.child(f"{user.id}").set({
+            self.user.child(f"{user.id}").update({
                 'coin' : remaining_amount
                 })
             return remaining_amount
+
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -80,7 +75,7 @@ class Coins(commands.Cog):
         coin = random.random()
         await self.mint_coin(user, coin, "reaction")
 
-    @bridge.bridge_command(name="balance", description="This command will return coins balance")
+    @bridge.bridge_command(name="balance", help="This command will return coins balance")
     async def balance(self, ctx):
         user = ctx.author
         coin = await self.check_coin(user)
@@ -97,7 +92,7 @@ class Coins(commands.Cog):
         else:
             await ctx.respond("You have no IDS coins")
 
-    @bridge.bridge_command(name="give", description="This command will transfer coins to other's wallet")
+    @bridge.bridge_command(name="give", help="This command will transfer coins to other's wallet")
     async def give(self, ctx, user: discord.Member, amount: float):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         sender = ctx.author
@@ -124,9 +119,9 @@ class Coins(commands.Cog):
         else:
             await ctx.respond("Insufficient IDS coin balance or wrong amount")
 
-    @bridge.bridge_command(name="rank", description="This command show richest users ranking")
+    @bridge.bridge_command(name="rank", help="This command show richest users ranking")
     async def rank(self, ctx):
-        result = ref.order_by_child('coin').limit_to_last(10).get()
+        result = self.user.order_by_child('coin').limit_to_last(10).get()
         ranks = list(result.items())
         ranks.reverse()
         leaderboard = {}

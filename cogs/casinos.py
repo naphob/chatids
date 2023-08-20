@@ -1,17 +1,20 @@
+import json
 import discord
 import random
 from datetime import date
 from rich.console import Console
 from discord.ext import commands, bridge
+from firebase_admin import db
 
 
 console = Console()
-quota = {}
 
 class RandomView(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
-        self.bot = bot
+        self.bot = bot,
+        self.coins = bot.get_cog('Coins')
+        self.user = self.coins.get_user()
 
     @discord.ui.button(label="โยก", custom_id="buy", style=discord.ButtonStyle.blurple, emoji="🕹️")
     async def slot_button_callback(self, button, interaction):
@@ -25,30 +28,33 @@ class RandomView(discord.ui.View):
             )
             slot_result = f"{result[0]} {result[1]} {result[2]}"
             console.log(f"{user.display_name} : {slot_result}")
-            coins = self.bot.get_cog('Coins')
+            coins = self.coins
             user_balance = await coins.check_coin(user)
-            await coins.deduct_coin(user, 10)
-            if result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
-                rewards= 1000000
-                await coins.mint_coin(user, rewards, "slot machine")
-            elif result[0] == result[1] and result[0] == result[2]:
-                rewards = 50000
-                await coins.mint_coin(user, rewards, "slot machine")
-            elif result[0] == result[1] or result[1] == result[2]:
-                rewards = 100
-                await coins.mint_coin(user, rewards, "slot machine")
-            elif result[0] == result[1] or result[0] == result[2]:
-                rewards = 1000
-                await coins.mint_coin(user, rewards, "slot machine")
-            else:
-                rewards = 0
+            try:
+                await coins.deduct_coin(user, 10)
+                if result[0] == "7️⃣" and result[1] == "7️⃣" and result[2] == "7️⃣":
+                    rewards= 1000000
+                    await coins.mint_coin(user, rewards, "slot machine")
+                elif result[0] == result[1] and result[0] == result[2]:
+                    rewards = 50000
+                    await coins.mint_coin(user, rewards, "slot machine")
+                elif result[0] == result[1] or result[1] == result[2]:
+                    rewards = 100
+                    await coins.mint_coin(user, rewards, "slot machine")
+                elif result[0] == result[1] or result[0] == result[2]:
+                    rewards = 1000
+                    await coins.mint_coin(user, rewards, "slot machine")
+                else:
+                    rewards = 0
 
-            embed.add_field(name="Result", value=slot_result, inline=False)
-            embed.add_field(name="Player", value=user.display_name, inline=False)
-            embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
-            embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
+                embed.add_field(name="Result", value=slot_result, inline=False)
+                embed.add_field(name="Player", value=user.display_name, inline=False)
+                embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
+                embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
 
-            await interaction.response.send_message(embed=embed, ephemeral = True)
+                await interaction.response.send_message(embed=embed, ephemeral = True)
+            except:
+                await interaction.response.send_message("คุณมีเหรียญไม่พอ", ephemeral = True)
         else:
             await interaction.response.send_message("คุณโยกสล็อตเกินโควต้าต่อวันแล้ว", ephemeral = True)
 
@@ -68,23 +74,50 @@ class RandomView(discord.ui.View):
         result = random.choices(items, k=3)
         return result
 
+    # def quota_check(self, user):
+    #     if user not in quota:
+    #         quota[user] = {}
+    #         quota[user]['date'] = date.today()
+    #         quota[user]['count'] = quota[user].get('count', 0) + 1
+    #         # print(f"{user}: {quota[user]['count']}")
+    #         return True
+    #     elif quota[user]['date'] == date.today() and quota[user]['count'] < 10:
+    #         quota[user]['count'] = quota[user].get('count', 0) + 1
+    #         # print(f"{user}: {quota[user]['count']}")
+    #         return True
+    #     elif quota[user]['date'] != date.today():
+    #         quota[user]['date'] = date.today()
+    #         quota[user]['count'] = 1
+    #         # print(f"{user}: {quota[user]['count']}")
+    #         return True
+    #     elif quota[user]['count'] >= 10:
+    #         # print(f"{user}: {quota[user]['count']}")
+    #         return False
+
     def quota_check(self, user):
-        if user not in quota:
-            quota[user] = {}
-            quota[user]['date'] = date.today()
-            quota[user]['count'] = quota[user].get('count', 0) + 1
+        user_info = self.user.child(f"{user.id}")
+        quota_date = user_info.child('date').get()
+        quota_count = user_info.child('count').get()
+        today = date.today()
+        today_str = today.strftime("%Y-%m-%d")
+        today_json = json.dumps(today_str)
+        if user_info is None:
+            # print(f"{user}: {quota[user]['count']}")
+            return False
+        elif quota_date == today_json and quota_count < 10:
+            user_info.update({
+                'count' :  quota_count + 1
+                })
             # print(f"{user}: {quota[user]['count']}")
             return True
-        elif quota[user]['date'] == date.today() and quota[user]['count'] < 10:
-            quota[user]['count'] = quota[user].get('count', 0) + 1
+        elif quota_date != today_json:
+            user_info.update({
+                'date' : today_json,
+                'count' : 1
+                })
             # print(f"{user}: {quota[user]['count']}")
             return True
-        elif quota[user]['date'] != date.today():
-            quota[user]['date'] = date.today()
-            quota[user]['count'] = 1
-            # print(f"{user}: {quota[user]['count']}")
-            return True
-        elif quota[user]['count'] >= 10:
+        elif quota_date == today_str and quota_count >= 10:
             # print(f"{user}: {quota[user]['count']}")
             return False
 

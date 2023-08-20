@@ -3,6 +3,8 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import bridge
 from rich.console import Console
+import firebase_admin
+from firebase_admin import credentials
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
 from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
@@ -23,6 +25,17 @@ cogs_list = [
     'casinos',
     'utils'
 ]
+credential = os.getenv("FIREBASE_CREDENTIALS")
+DB_URL = os.getenv("DB_URL")
+UID = os.getenv("UID")
+cred = credentials.Certificate(credential)
+firebase_admin.initialize_app(cred, {
+    'databaseURL': DB_URL,
+    'databaseAuthVariableOverride' : {
+        'uid' : UID
+    }
+})
+
 
 @bot.event
 async def on_ready():
