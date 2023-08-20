@@ -8,7 +8,7 @@ from firebase_admin import credentials
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
 from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
-from cogs.casinos import RandomView
+from cogs.casinos import RandomView, MyModal
 
 console = Console()
 console = Console()
