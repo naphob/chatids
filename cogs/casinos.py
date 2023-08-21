@@ -170,8 +170,12 @@ class MyModal(discord.ui.Modal):
                     rewards = stake
                     await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'tod' and slot1 in result and slot2 in result:
-                    rewards = stake * 5.0
-                    await coins.mint_coin(user, rewards, "roll dice")
+                    if slot1 != slot2:
+                        rewards = stake * 5.0
+                        await coins.mint_coin(user, rewards, "roll dice")
+                    else:
+                        rewards = 0
+                        await coins.deduct_coin(user, stake)
                 else:
                     rewards = 0
                     await coins.deduct_coin(user, stake)
