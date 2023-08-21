@@ -9,6 +9,7 @@ from firebase_admin import db
 
 
 console = Console()
+MAX_QUOTA = 20
 
 class RandomView(discord.ui.View):
     def __init__(self, bot):
@@ -84,7 +85,7 @@ class RandomView(discord.ui.View):
         today_json = json.dumps(today_str)
         if user_info is None:
             return False
-        elif quota_date == today_json and quota_count < 10:
+        elif quota_date == today_json and quota_count < MAX_QUOTA:
             user_info.update({
                 'count' :  quota_count + 1
                 })
@@ -95,7 +96,7 @@ class RandomView(discord.ui.View):
                 'count' : 1
                 })
             return True
-        elif quota_date == today_str and quota_count >= 10:
+        elif quota_date == today_str and quota_count >= MAX_QUOTA:
             return False
 
 class MyModal(discord.ui.Modal):
@@ -107,10 +108,20 @@ class MyModal(discord.ui.Modal):
         self.user = self.coins.get_user()
 
         self.add_item(discord.ui.InputText(label="เงินเดิมพัน"))
+        if self.prediction == "favorite":
+            self.add_item(discord.ui.InputText(label="ทายผลเลขตัวที่ 1", max_length=1, style=discord.InputTextStyle.short))
+        elif self.prediction == "tod":
+            self.add_item(discord.ui.InputText(label="ทายผลเลขตัวที่ 1", max_length=1, style=discord.InputTextStyle.short))
+            self.add_item(discord.ui.InputText(label="ทายผลเลขตัวที่ 2", max_length=1, style=discord.InputTextStyle.short))
 
     async def callback(self, interaction: discord.Interaction):
         stake = float(self.children[0].value)
         user = interaction.user
+        if self.prediction == "favorite":
+            slot1 = self.children[1].value
+        elif self.prediction == "tod":
+            slot1 = self.children[1].value
+            slot2 = self.children[2].value
         coins = self.coins
         user_balance = await coins.check_coin(user)
         if user_balance >= stake:
@@ -137,10 +148,10 @@ class MyModal(discord.ui.Modal):
                 dice_sum = result[0] + result[1] + result[2]
                 num_tpye = dice_sum % 2
                 rewards = 0
-                if self.prediction == 'high' and dice_sum >= 11:
+                if self.prediction == 'high' and dice_sum >= 10:
                     rewards = stake
                     await coins.mint_coin(user, rewards, "roll dice")
-                elif self.prediction == 'low' and dice_sum <= 10:
+                elif self.prediction == 'low' and dice_sum <= 12:
                     rewards = stake
                     await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'even' and num_tpye == 0:
@@ -152,9 +163,19 @@ class MyModal(discord.ui.Modal):
                 elif self.prediction == 'tripple' and result[0] == result[1] and result[0] == result[2]:
                     rewards = stake * 3.0
                     await coins.mint_coin(user, rewards, "roll dice")
+                elif self.prediction == 'eleven' and dice_sum == 11:
+                    rewards = stake * 7.0
+                    await coins.mint_coin(user, rewards, "roll dice")
+                elif self.prediction == 'favorite' and slot1 in result:
+                    rewards = stake
+                    await coins.mint_coin(user, rewards, "roll dice")
+                elif self.prediction == 'tod' and slot1 in result and slot2 in result:
+                    rewards = stake * 5.0
+                    await coins.mint_coin(user, rewards, "roll dice")
                 else:
                     rewards = 0
                     await coins.deduct_coin(user, stake)
+                embed.add_field(name="Prediction", value=self.prediction, inline=False)
                 embed.add_field(name="Result", value=roll_result, inline=True)
                 embed.add_field(name="Sum", value=dice_sum , inline=True)
                 embed.add_field(name="Player", value=user.display_name, inline=False)
@@ -179,44 +200,44 @@ class DiceView(discord.ui.View):
         super().__init__(timeout=None)
         self.bot = bot
 
-    @discord.ui.button(label="สูง", custom_id="high", style=discord.ButtonStyle.blurple)
+    @discord.ui.button(label="สูง", custom_id="high", style=discord.ButtonStyle.green)
     async def high_button_callback(self, button, interaction):
-        user = interaction.user
-        # quota_count = RandomView.quota_check(self, user)
-        # if quota_count == True:
         modal = MyModal(self.bot, "high", title="ทายผล: สูง")
         await interaction.response.send_modal(modal)
 
     @discord.ui.button(label="ต่ำ", custom_id="low", style=discord.ButtonStyle.green)
     async def low_button_callback(self, button, interaction):
-        user = interaction.user
-        # quota_count = RandomView.quota_check(self, user)
-        # if quota_count == True:
         modal = MyModal(self.bot, "low", title="ทายผล: ต่ำ")
         await interaction.response.send_modal(modal)
 
-    @discord.ui.button(label="คู่", custom_id="even", style=discord.ButtonStyle.gray)
+    @discord.ui.button(label="คู่", custom_id="even", style=discord.ButtonStyle.green)
     async def even_button_callback(self, button, interaction):
-        user = interaction.user
-        # quota_count = RandomView.quota_check(self, user)
-        # if quota_count == True:
         modal = MyModal(self.bot, "even", title="ทายผล: คู่")
         await interaction.response.send_modal(modal)
 
-    @discord.ui.button(label="คี่", custom_id="odd", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="คี่", custom_id="odd", style=discord.ButtonStyle.green)
     async def odd_button_callback(self, button, interaction):
-        user = interaction.user
-        # quota_count = RandomView.quota_check(self, user)
-        # if quota_count == True:
         modal = MyModal(self.bot, "odd", title="ทายผล: คี่")
         await interaction.response.send_modal(modal)
 
-    @discord.ui.button(label="ตอง", custom_id="triple", style=discord.ButtonStyle.blurple, emoji="🎲")
+    @discord.ui.button(label="ตอง", custom_id="triple", style=discord.ButtonStyle.blurple)
     async def triple_button_callback(self, button, interaction):
-        user = interaction.user
-        # quota_count = RandomView.quota_check(self, user)
-        # if quota_count == True:
         modal = MyModal(self.bot, "triple", title="ทายผล: ตอง")
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(label="เต็ง", custom_id="favorite", style=discord.ButtonStyle.green)
+    async def favorite_button_callback(self, button, interaction):
+        modal = MyModal(self.bot, "favorite", title="ทายผล: เต็ง")
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(label="โต๊ด", custom_id="tod", style=discord.ButtonStyle.blurple)
+    async def tod_button_callback(self, button, interaction):
+        modal = MyModal(self.bot, "tod", title="ทายผล: โต๊ด")
+        await interaction.response.send_modal(modal)
+
+    @discord.ui.button(label="11 ไฮโล", custom_id="eleven", style=discord.ButtonStyle.red)
+    async def eleven_button_callback(self, button, interaction):
+        modal = MyModal(self.bot, "eleven", title="ทายผล: 11 ไฮโล")
         await interaction.response.send_modal(modal)
 
 class Casinos(commands.Cog):
@@ -235,7 +256,7 @@ class Casinos(commands.Cog):
         embed.set_author(name="IDS Casino", icon_url="https://phoneky.co.uk/thumbs/screensavers/down/original/animatedsl_ylrdr78z.gif")
         embed.add_field(name="Example", value= example)
         embed.add_field(name="Fee", value= fee)
-        embed.set_footer(text="ารพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนเล่น", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
+        embed.set_footer(text="การพนันมีความเสี่ยง โปรดตั้งสติทุกครั้งก่อนเล่น", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
         view = RandomView(self.bot)
         await ctx.respond(embed=embed, view=view)
 
@@ -245,7 +266,7 @@ class Casinos(commands.Cog):
             title="ไฮโล 🎲",
             description="มาวัดดวงกับลูกเต๋ากันว่าใครจะเฮง"
         )
-        example = "สูง-ต่ำ x1 จากเดิมพัน\nคู่-คี่ x1 จากเดิมพัน\nตอง x3 จากเดิมพัน"
+        example = "สูง-ต่ำ x1 จากเดิมพัน\nคู่-คี่ x1 จากเดิมพัน\nเต็ง x1 จากเดิมพัน\nตอง x3 จากเดิมพัน\nโต๊ด x5 จากเดิมพัน\n11 ไฮโล x7 จากเดิมพัน"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.set_author(name="IDS Casino", icon_url="https://phoneky.co.uk/thumbs/screensavers/down/original/animatedsl_ylrdr78z.gif")
         embed.add_field(name="รางวัล", value= example)
