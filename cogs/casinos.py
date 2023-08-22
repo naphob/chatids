@@ -150,35 +150,30 @@ class MyModal(discord.ui.Modal):
                 rewards = 0
                 if self.prediction == 'high' and dice_sum >= 10:
                     rewards = stake
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'low' and dice_sum <= 12:
                     rewards = stake
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'even' and num_tpye == 0:
                     rewards = stake
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'odd' and num_tpye != 0:
                     rewards = stake
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'tripple' and result[0] == result[1] and result[0] == result[2]:
                     rewards = stake * 3.0
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'eleven' and dice_sum == 11:
                     rewards = stake * 7.0
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'favorite' and slot1 in result:
                     rewards = stake
-                    await coins.mint_coin(user, rewards, "roll dice")
                 elif self.prediction == 'tod' and slot1 in result and slot2 in result:
                     if slot1 != slot2:
                         rewards = stake * 5.0
-                        await coins.mint_coin(user, rewards, "roll dice")
                     else:
                         rewards = 0
-                        await coins.deduct_coin(user, stake)
                 else:
                     rewards = 0
+                if rewards > 0:
+                    await coins.mint_coin(user, rewards, "rolling dice")
+                else:
                     await coins.deduct_coin(user, stake)
+                user_balance = await coins.check_coin(user)
                 embed.add_field(name="Prediction", value=self.prediction, inline=False)
                 embed.add_field(name="Result", value=roll_result, inline=True)
                 embed.add_field(name="Sum", value=dice_sum , inline=True)
@@ -270,7 +265,7 @@ class Casinos(commands.Cog):
             title="ไฮโล 🎲",
             description="มาวัดดวงกับลูกเต๋ากันว่าใครจะเฮง"
         )
-        example = "สูง-ต่ำ x1 จากเดิมพัน\nคู่-คี่ x1 จากเดิมพัน\nเต็ง x1 จากเดิมพัน\nตอง x3 จากเดิมพัน\nโต๊ด x5 จากเดิมพัน\n11 ไฮโล x7 จากเดิมพัน"
+        example = "สูง-ต่ำ `x1` จากเดิมพัน\nคู่-คี่ `x1` จากเดิมพัน\nเต็ง `x1` จากเดิมพัน\nตอง `x3` จากเดิมพัน\nโต๊ด `x5` จากเดิมพัน\n11 ไฮโล `x7` จากเดิมพัน"
         # embed.add_field(name="รางวัล", value=rewards)
         embed.set_author(name="IDS Casino", icon_url="https://phoneky.co.uk/thumbs/screensavers/down/original/animatedsl_ylrdr78z.gif")
         embed.add_field(name="รางวัล", value= example)
