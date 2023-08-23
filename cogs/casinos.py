@@ -148,9 +148,9 @@ class MyModal(discord.ui.Modal):
                 dice_sum = result[0] + result[1] + result[2]
                 num_tpye = dice_sum % 2
                 rewards = 0
-                if self.prediction == 'high' and dice_sum >= 10:
+                if self.prediction == 'high' and dice_sum >= 12:
                     rewards = stake
-                elif self.prediction == 'low' and dice_sum <= 12:
+                elif self.prediction == 'low' and dice_sum <= 10:
                     rewards = stake
                 elif self.prediction == 'even' and num_tpye == 0:
                     rewards = stake
