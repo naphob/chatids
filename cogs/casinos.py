@@ -52,7 +52,7 @@ class RandomView(discord.ui.View):
                 embed.add_field(name="Result", value=slot_result, inline=False)
                 embed.add_field(name="Player", value=user.display_name, inline=False)
                 embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
-                embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
+                embed.add_field(name="Rewards", value=f"`{rewards:,.2f}` 🪙", inline=True)
 
                 await interaction.response.send_message(embed=embed, ephemeral = True)
             except:
@@ -179,7 +179,7 @@ class MyModal(discord.ui.Modal):
                 embed.add_field(name="Sum", value=dice_sum , inline=True)
                 embed.add_field(name="Player", value=user.display_name, inline=False)
                 embed.add_field(name="Balance", value=f"`{user_balance:,.2f}`", inline=True)
-                embed.add_field(name="Rewards", value=f"`{rewards}` 🪙", inline=True)
+                embed.add_field(name="Rewards", value=f"`{rewards:,.2f}` 🪙", inline=True)
                 await interaction.response.send_message(embed=embed, ephemeral = True)
             else:
                 await interaction.response.send_message("คุณใช้โควต้าต่อวันเกินกำหนดแล้ว", ephemeral = True)
