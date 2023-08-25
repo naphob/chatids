@@ -94,7 +94,7 @@ class GetRoles(discord.ui.View):
         user = interaction.user
         await self.get_role(role, user, interaction)
 
-    @discord.ui.button(label="Medic", custom_id="medic", style=discord.ButtonStyle.primary, emoji="💉")
+    @discord.ui.button(label="Medic", custom_id="medic", style=discord.ButtonStyle.primary, emoji="⛑️")
     async def medic_button_callback(self, button, interaction):
         role = 1134438399957270569
         user = interaction.user
@@ -109,6 +109,12 @@ class GetRoles(discord.ui.View):
     @discord.ui.button(label="Pilot", custom_id="pilot", style=discord.ButtonStyle.primary, emoji="🛩️")
     async def pilot_button_callback(self, button, interaction):
         role = 1134438658829729833
+        user = interaction.user
+        await self.get_role(role, user, interaction)
+
+    @discord.ui.button(label="Salvager", custom_id="salvager", style=discord.ButtonStyle.primary, emoji="🦺")
+    async def salvager_button_callback(self, button, interaction):
+        role = 1144626015168106577
         user = interaction.user
         await self.get_role(role, user, interaction)
 
