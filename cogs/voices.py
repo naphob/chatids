@@ -135,9 +135,9 @@ class Voices(commands.Cog):
             message = f'{username[0]} พูดว่า {words}'
             err_msg = 'You are not in a voice channel.'
             await self.tts_vc(ctx, user, message, err_msg)
-            await ctx.send_followup("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน")
+            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
         else:
-            await ctx.send_followup("คุณมี IDS Coin ไม่พอ")
+            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
     @discord.slash_command(name="send", description="This command will send voice message to mentioned user connected to voice channel")
     async def send(self, ctx, member: discord.Member, words):
