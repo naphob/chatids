@@ -134,9 +134,9 @@ class Voices(commands.Cog):
             message = f'{username[0]} พูดว่า {args}'
             err_msg = 'You are not in a voice channel.'
             await self.tts_vc(ctx, user, message, err_msg)
-            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+            await ctx.send_response("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
         else:
-            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
+            await ctx.send_response("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
     @bridge.bridge_command(name="send", description="This command will send voice message to mentioned user connected to voice channel")
     async def send(self, ctx, member: discord.Member, *args):
@@ -148,9 +148,9 @@ class Voices(commands.Cog):
             message = f'{username[0]} ฝากบอกว่า {args}'
             err_msg = 'Receiver is not in a voice channel.'
             await self.tts_vc(ctx, member, message, err_msg)
-            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+            await ctx.send_response("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
         else:
-            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
+            await ctx.send_response("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
     @bridge.bridge_command(name="rec", description="This command will record your voice message then send it to targeted user after stop recording")
     async def rec(self, ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
