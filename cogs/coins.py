@@ -75,7 +75,7 @@ class Coins(commands.Cog):
         coin = random.random()
         await self.mint_coin(user, coin, "reaction")
 
-    @bridge.bridge_command(name="balance", help="This command will return coins balance")
+    @discord.slash_command(name="balance", help="This command will return coins balance")
     async def balance(self, ctx):
         user = ctx.author
         coin = await self.check_coin(user)
@@ -92,7 +92,7 @@ class Coins(commands.Cog):
         else:
             await ctx.respond("You have no IDS coins")
 
-    @bridge.bridge_command(name="give", help="This command will transfer coins to other's wallet")
+    @discord.slash_command(name="give", help="This command will transfer coins to other's wallet")
     async def give(self, ctx, user: discord.Member, amount: float):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         sender = ctx.author
@@ -119,7 +119,7 @@ class Coins(commands.Cog):
         else:
             await ctx.respond("Insufficient IDS coin balance or wrong amount")
 
-    @bridge.bridge_command(name="rank", help="This command show richest users ranking")
+    @discord.slash_command(name="rank", help="This command show richest users ranking")
     async def rank(self, ctx):
         result = self.user.order_by_child('coin').limit_to_last(10).get()
         ranks = list(result.items())

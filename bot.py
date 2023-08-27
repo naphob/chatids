@@ -1,7 +1,7 @@
 import os
 import discord
 from dotenv import load_dotenv
-from discord.ext import bridge
+from discord.ext import commands
 from rich.console import Console
 import firebase_admin
 from firebase_admin import credentials
@@ -15,7 +15,8 @@ console = Console()
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.all()
-bot = bridge.Bot(command_prefix='!', intents=intents)
+# bot = bridge.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot()
 cogs_list = [
     'welcomes',
     'voices',

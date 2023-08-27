@@ -1,6 +1,6 @@
 import discord
 from rich.console import Console
-from discord.ext import commands, bridge, pages
+from discord.ext import commands, pages
 
 console = Console()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
@@ -145,7 +145,7 @@ class Shops(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(name="shop", description="show item shop")
+    @discord.slash_command(name="shop", description="show item shop")
     async def shop(self, ctx):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
@@ -163,7 +163,7 @@ class Shops(commands.Cog):
         else:
             await ctx.respond("You don't have permissioin to run this command.", ephemeral=True)
 
-    @bridge.bridge_command(name="nitro", description="send item to buyer")
+    @discord.slash_command(name="nitro", description="send item to buyer")
     async def nitro(self, ctx, url, channel : discord.TextChannel):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
@@ -178,7 +178,7 @@ class Shops(commands.Cog):
         else:
             await ctx.respond("You don't have permissioin to run this command.", ephemeral=True)
 
-    # @bridge.bridge_command(name="page")
+    # @discord.slash_command(name="page")
     # async def page(self, ctx: discord.ApplicationContext):
     #     sale_page = []
     #     embed = discord.Embed(

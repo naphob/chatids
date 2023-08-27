@@ -2,7 +2,7 @@ import os
 import re
 import discord
 import discord.ui
-from discord.ext import commands, bridge
+from discord.ext import commands
 from dotenv import load_dotenv
 from rich.console import Console
 from PIL import Image, ImageFont, ImageDraw
@@ -166,11 +166,11 @@ class Welcomes(commands.Cog):
         await member.add_roles(member.guild.get_role(role))
         await self.welcome_pic(member)
 
-    @bridge.bridge_command(name="welcome", description="Welcome new member")
+    @discord.slash_command(name="welcome", description="Welcome new member")
     async def welcome(self,ctx, user: discord.Member):
         await self.welcome_pic(user)
 
-    @bridge.bridge_command(name="role", description="Select a role")
+    @discord.slash_command(name="role", description="Select a role")
     async def role(self, ctx):
         embed = discord.Embed(
                 title = "Welcome to the verse",

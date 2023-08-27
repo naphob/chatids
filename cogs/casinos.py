@@ -4,7 +4,7 @@ import random
 from datetime import date
 from discord.interactions import Interaction
 from rich.console import Console
-from discord.ext import commands, bridge
+from discord.ext import commands
 from firebase_admin import db
 
 
@@ -243,7 +243,7 @@ class Casinos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(name="slot", description="play slot machine")
+    @discord.slash_command(name="slot", description="play slot machine")
     async def slot(self, ctx):
         embed = discord.Embed(
             title="เครื่องผลิต🧂",
@@ -259,7 +259,7 @@ class Casinos(commands.Cog):
         view = RandomView(self.bot)
         await ctx.respond(embed=embed, view=view)
 
-    @bridge.bridge_command(name="dice", description="play dice high-low")
+    @discord.slash_command(name="dice", description="play dice high-low")
     async def dice(self, ctx):
         embed = discord.Embed(
             title="ไฮโล 🎲",

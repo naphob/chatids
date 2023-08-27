@@ -1,5 +1,5 @@
 import discord
-from discord.ext import commands, bridge
+from discord.ext import commands
 from random import randrange
 from rich.console import Console
 
@@ -71,7 +71,7 @@ class Giveaways(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @bridge.bridge_command(name="giveaway", description="This command create give away post")
+    @discord.slash_command(name="giveaway", description="This command create give away post")
     async def giveaway(self, ctx):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
