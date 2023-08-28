@@ -75,7 +75,7 @@ class Coins(commands.Cog):
         coin = random.random()
         await self.mint_coin(user, coin, "reaction")
 
-    @discord.slash_command(name="balance", help="This command will return coins balance")
+    @discord.slash_command(name="balance", description="This command will return coins balance")
     async def balance(self, ctx):
         user = ctx.author
         coin = await self.check_coin(user)
@@ -84,30 +84,28 @@ class Coins(commands.Cog):
             description= f"Balance: `{coin:,.2f}`",
             title= f"{user.display_name}'s Wallet"
         )
-        embed.set_author(name="Bank of IDS")
+        embed.set_author(name="Bank of IDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
             await ctx.respond(embed=embed)
             console.log(f"{user.display_name}'s balance: {coin:,.2f} IDS Coins.")
         else:
-            await ctx.respond("You have no IDS coins")
+            await ctx.send_response("You have no IDS coins", ephemeral = True)
 
-    @discord.slash_command(name="give", help="This command will transfer coins to other's wallet")
+    @discord.slash_command(name="give", description="This command will transfer coins to other's wallet")
     async def give(self, ctx, user: discord.Member, amount: float):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         sender = ctx.author
         receiver = user
-        # sender_coin = await self.check_coin(sender) #ref.child(f"{sender.id}").child('coin').get()
-        # receiver_coin = await self.check_coin(receiver) #ref.child(f"{receiver.id}").child('coin').get()
-        if amount > 0:
+        coin = await self.check_coin(sender)
+        if amount > 0 and coin > 0:
             await self.deduct_coin(sender, amount)
             await self.add_coin(receiver, amount)
             embed = discord.Embed(
             color=discord.Color.dark_purple(),
-            title= f"Bank of IDS",
-            description= f"IDS Coin Transfer Transaction"
+            title="IDS Coin Transfer Transaction"
             )
-
+            embed.set_author(name="Bank of iDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
             embed.add_field(name="Sender", value=sender.display_name, inline=True)
             embed.add_field(name=":arrow_right:", value=f"`{amount}`", inline=True)
             embed.add_field(name="Recipient", value=receiver.display_name, inline=True)
@@ -117,9 +115,9 @@ class Coins(commands.Cog):
             await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
             console.log(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
         else:
-            await ctx.respond("Insufficient IDS coin balance or wrong amount")
+            await ctx.send_response("Insufficient IDS coin balance or wrong amount", ephemeral = True)
 
-    @discord.slash_command(name="rank", help="This command show richest users ranking")
+    @discord.slash_command(name="rank", description="This command show richest users ranking")
     async def rank(self, ctx):
         result = self.user.order_by_child('coin').limit_to_last(10).get()
         ranks = list(result.items())
@@ -130,9 +128,9 @@ class Coins(commands.Cog):
 
         embed = discord.Embed(
             color=discord.Color.dark_purple(),
-            description= "The Richest Leaderboard",
-            title= "Bank of IDS"
+            title= "The Richest Leaderboard"
         )
+        embed.set_author(name="Bank of iDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
         names = ''
         for rank, user in enumerate(leaderboard):
             if rank+1 == 1:
