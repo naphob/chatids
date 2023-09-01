@@ -102,11 +102,12 @@ class Voices(commands.Cog):
         command to join voice channel
         """
         if not ctx.author.voice:
-            await ctx.respond(f"{ctx.author.display_name} is not connected to a voice channel")
+            await ctx.send_response(f"{ctx.author.display_name} is not connected to a voice channel", ephemeral = True)
             return
         else:
             channel = ctx.author.voice.channel
         await channel.connect()
+        await ctx.send_response("bot connected to a voice channel", ephemeral = True)
 
     @discord.slash_command(name='leave', description='This command will make the bot leave the voice channel')
     async def leave(self, ctx):
@@ -115,10 +116,11 @@ class Voices(commands.Cog):
         """
         vc = ctx.voice_client
         if not vc:
-            await ctx.respond("I am not connected to a voice channel.")
+            await ctx.send_response("I am not connected to a voice channel.", ephemeral = True)
             return
 
         await vc.disconnect()
+        await ctx.send_response("bot disconnnected from voice channel.", ephemeral = True)
 
     @discord.slash_command(name="say", description="This command will make the bot speak what you want in the voice channel")
     async def say(self, ctx, words):
