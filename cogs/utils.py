@@ -10,11 +10,11 @@ class Utils(commands.Cog):
 
     @discord.slash_command(name='move_all', description='This command will move all users to another voice channel')
     @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
-    async def move_all(self, ctx, vc: discord.VoiceChannel):
-        channel = ctx.author.voice.channel
+    async def move_all(self, ctx, before: discord.VoiceChannel, after: discord.VoiceChannel):
+        channel = before
         for member in channel.members:
-            await member.move_to(vc)
-        await ctx.respond(f"Move all user to #<{vc}>")
+            await member.move_to(after)
+        await ctx.respond(f"Move all user to {after}")
 
 
 def setup(bot): # this is called by Pycord to setup the cog
