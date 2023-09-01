@@ -14,7 +14,7 @@ class Utils(commands.Cog):
         channel = before
         for member in channel.members:
             await member.move_to(after)
-        await ctx.respond(f"Move all user to {after}")
+        await ctx.respond(f"Move all user to {after.mention}")
 
 
 def setup(bot): # this is called by Pycord to setup the cog
