@@ -64,7 +64,7 @@ class Voices(commands.Cog):
                     sound.save("tts.mp3")
                     source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                     vc.play(source)
-                    # await ctx.send(tts_message)
+                    await ctx.send(tts_message)
                     while vc.is_playing():
                         await asyncio.sleep(3)
                 else:
@@ -97,63 +97,66 @@ class Voices(commands.Cog):
             message = 'ออกห้องไปแล้ว'
             await self.noti(member, before, message)
 
-    @bridge.bridge_command(name='summon', description='This command will make the bot join the voice channel')
+    @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
         """
         command to join voice channel
         """
         if not ctx.author.voice:
-            await ctx.respond(f"{ctx.author.display_name} is not connected to a voice channel")
+            await ctx.send_response(f"{ctx.author.display_name} is not connected to a voice channel", ephemeral = True)
             return
         else:
             channel = ctx.author.voice.channel
         await channel.connect()
+        await ctx.send_response("bot connected to a voice channel", ephemeral = True)
 
-    @bridge.bridge_command(name='leave', description='This command will make the bot leave the voice channel')
+    @discord.slash_command(name='leave', description='This command will make the bot leave the voice channel')
     async def leave(self, ctx):
         """
         command to leave voice channel
         """
         vc = ctx.voice_client
         if not vc:
-            await ctx.respond("I am not connected to a voice channel.")
+            await ctx.send_response("Bot is not connected to a voice channel.", ephemeral = True)
             return
 
         await vc.disconnect()
 
-    @bridge.bridge_command(name="say", description="This command will make the bot speak what you want in the voice channel")
-    async def say(self, ctx, *args):
+    @discord.slash_command(name="say", description="This command will make the bot speak what you want in the voice channel")
+    async def say(self, ctx, words):
         """
         Command to play voice message in the user's current voice channel
         """
         coins = self.bot.get_cog('Coins')
-        user = ctx.message.author
+        user = ctx.author
         user_balance = await coins.check_coin(user)
+        await ctx.defer(ephemeral = True)
         if user_balance >= 10.0:
             await coins.deduct_coin(user, 10)
             username = user.display_name.split('[')
-            message = f'{username[0]} พูดว่า {args}'
+            message = f'{username[0]} พูดว่า {words}'
             err_msg = 'You are not in a voice channel.'
             await self.tts_vc(ctx, user, message, err_msg)
-            await ctx.send_response("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+            await ctx.send_followup("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
         else:
-            await ctx.send_response("คุณมี IDS Coin ไม่พอ", ephemeral = True)
+            await ctx.send_followup("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
-    @bridge.bridge_command(name="send", description="This command will send voice message to mentioned user connected to voice channel")
-    async def send(self, ctx, member: discord.Member, *args):
+    @discord.slash_command(name="send", description="This command will send voice message to mentioned user connected to voice channel")
+    async def send(self, ctx, member: discord.Member, words):
         coins = self.bot.get_cog('Coins')
-        user = ctx.message.author
+        user = ctx.author
         user_balance = await coins.check_coin(user)
+        await ctx.defer(ephemeral = True)
         if user_balance >= 10.0:
             username = user.display_name.split('[')
-            message = f'{username[0]} ฝากบอกว่า {args}'
+            message = f'{username[0]} ฝากบอกว่า {words}'
             err_msg = 'Receiver is not in a voice channel.'
             await self.tts_vc(ctx, member, message, err_msg)
-            await ctx.respond("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
+            await ctx.send_followup("คุณได้ใช้ 10 coin แล้ว ขอบคุณที่ใช้บริการน้อน", ephemeral = True)
         else:
-            await ctx.respond("คุณมี IDS Coin ไม่พอ", ephemeral = True)
+            await ctx.send_followup("คุณมี IDS Coin ไม่พอ", ephemeral = True)
 
-    @bridge.bridge_command(name="rec", description="This command will record your voice message then send it to targeted user after stop recording")
+    @discord.slash_command(name="rec", description="This command will record your voice message then send it to targeted user after stop recording")
     async def rec(self, ctx, user: discord.Member):  # If you're using commands.Bot, this will also work.
         voice = ctx.author.voice
 
@@ -189,7 +192,7 @@ class Voices(commands.Cog):
             await asyncio.sleep(10)
         await vc.disconnect()
 
-    @bridge.bridge_command(name="stop_rec", description="This command will stop recording your voice message")
+    @discord.slash_command(name="stop_rec", description="This command will stop recording your voice message")
     async def stop_rec(self, ctx):
         if ctx.guild.id in connections:  # Check if the guild is in the cache.
             vc = connections[ctx.guild.id]
