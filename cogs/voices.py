@@ -1,3 +1,4 @@
+import re
 import random
 import discord
 from discord.ext import commands, bridge
@@ -5,10 +6,12 @@ import asyncio
 from gtts import gTTS
 from queue import Queue
 from rich.console import Console
+from discord.utils import get
 
 console = Console()
 q = Queue()
 connections = {}
+room_no = 0
 
 class Voices(commands.Cog):
     def __init__(self, bot):
@@ -77,12 +80,13 @@ class Voices(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        temp_channel_name = f"{member.display_name}'s room"
-
+        global room_no
+        regex = "🚀Gaming\s\d+$"
         if before.channel is None and after.channel is not None and not after.afk and not member.bot:
             # A user joined a voice channel
             if after.channel.name == "สร้างห้อง":
-                temp_channel = await after.channel.clone(name=temp_channel_name)
+                room_no += 1
+                temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
                 if temp_channel is not None:
                     await member.move_to(temp_channel)
             else:
@@ -93,7 +97,19 @@ class Voices(commands.Cog):
                 await coins.mint_coin(member, coin, "joining vc")
         elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot:
             # A user moved to another voice channel
-            if before.channel.name != temp_channel_name:
+            match = re.match(regex, before.channel.name)
+            after_match = re.match(regex, after.channel.name)
+            if before.channel is not None and match :
+                if len(before.channel.members) == 0:
+                    await before.channel.delete()
+                    room_no -= 1
+            elif after.channel.name == "สร้างห้อง":
+                room_no += 1
+                temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
+                if temp_channel is not None:
+                    await member.move_to(temp_channel)
+            elif after_match is None:
+                print(match)
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
         elif after.channel and before.afk and not after.afk and not member.bot:
@@ -102,13 +118,16 @@ class Voices(commands.Cog):
             await self.noti(member, after, message)
         elif after.channel is None and before.channel is not None and not member.bot:
             # A user left the voice channel
-            if before.channel is not None:
-                if before.channel.name == temp_channel_name:
-                    if len(before.channel.members) == 0:
-                        await before.channel.delete()
-                else:
-                    message = 'ออกห้องไปแล้ว'
-                    await self.noti(member, before, message)
+            match = re.match(regex, before.channel.name)
+            if match :
+                print(before.channel.name)
+                if len(before.channel.members) == 0:
+                    await before.channel.delete()
+                    room_no -= 1
+            else:
+                print(before.channel.name)
+                message = 'ออกห้องไปแล้ว'
+                await self.noti(member, before, message)
 
     @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
