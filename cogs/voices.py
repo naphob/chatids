@@ -77,25 +77,38 @@ class Voices(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
+        temp_channel_name = f"{member.display_name}'s room"
+
         if before.channel is None and after.channel is not None and not after.afk and not member.bot:
             # A user joined a voice channel
-            message = 'เข้ามาในห้องแล้ว'
-            await self.noti(member, after, message)
-            coins = self.bot.get_cog('Coins')
-            coin = random.random()
-            await coins.mint_coin(member, coin, "joining vc")
+            if after.channel.name == "สร้างห้อง":
+                temp_channel = await after.channel.clone(name=temp_channel_name)
+                if temp_channel is not None:
+                    await member.move_to(temp_channel)
+            else:
+                message = 'เข้ามาในห้องแล้ว'
+                await self.noti(member, after, message)
+                coins = self.bot.get_cog('Coins')
+                coin = random.random()
+                await coins.mint_coin(member, coin, "joining vc")
         elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot:
             # A user moved to another voice channel
-            message = 'ย้ายมาในห้องนี้แล้ว'
-            await self.noti(member, after, message)
+            if before.channel.name != temp_channel_name:
+                message = 'ย้ายมาในห้องนี้แล้ว'
+                await self.noti(member, after, message)
         elif after.channel and before.afk and not after.afk and not member.bot:
             # A user's back from AFK to voice channel
             message = 'กลับมาจาก AFK แล้ว'
             await self.noti(member, after, message)
         elif after.channel is None and before.channel is not None and not member.bot:
             # A user left the voice channel
-            message = 'ออกห้องไปแล้ว'
-            await self.noti(member, before, message)
+            if before.channel is not None:
+                if before.channel.name == temp_channel_name:
+                    if len(before.channel.members) == 0:
+                        await before.channel.delete()
+                else:
+                    message = 'ออกห้องไปแล้ว'
+                    await self.noti(member, before, message)
 
     @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
