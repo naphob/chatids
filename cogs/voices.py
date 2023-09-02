@@ -64,7 +64,7 @@ class Voices(commands.Cog):
                     sound.save("tts.mp3")
                     source = await discord.FFmpegOpusAudio.from_probe("tts.mp3", method="fallback")
                     vc.play(source)
-                    await ctx.send(tts_message)
+                    # await ctx.send(tts_message)
                     while vc.is_playing():
                         await asyncio.sleep(3)
                 else:
