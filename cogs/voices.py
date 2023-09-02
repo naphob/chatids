@@ -121,6 +121,7 @@ class Voices(commands.Cog):
             return
 
         await vc.disconnect()
+        await ctx.send_response("bot disconnected tfrom voice channel", ephemeral = True)
 
     @discord.slash_command(name="say", description="This command will make the bot speak what you want in the voice channel")
     async def say(self, ctx, words):
