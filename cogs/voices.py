@@ -103,7 +103,7 @@ class Voices(commands.Cog):
                 if len(before.channel.members) == 0:
                     await before.channel.delete()
                     room_no -= 1
-            elif after.channel.name == "สร้างห้อง":
+            elif after.channel.id == 1147446860961816648:
                 room_no += 1
                 temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
                 if temp_channel is not None:
