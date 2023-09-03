@@ -84,7 +84,7 @@ class Voices(commands.Cog):
         regex = "🚀Gaming\s\d+$"
         if before.channel is None and after.channel is not None and not after.afk and not member.bot:
             # A user joined a voice channel
-            if after.channel.name == "สร้างห้อง":
+            if after.channel.id == 1147446860961816648:
                 room_no += 1
                 temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
                 if temp_channel is not None:
