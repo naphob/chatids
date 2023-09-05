@@ -120,12 +120,13 @@ class Voices(commands.Cog):
             # A user left the voice channel
             match = re.match(regex, before.channel.name)
             if match :
-                print(before.channel.name)
                 if len(before.channel.members) == 0:
                     await before.channel.delete()
                     room_no -= 1
+                else:
+                    message = 'ออกห้องไปแล้ว'
+                    await self.noti(member, before, message)
             else:
-                print(before.channel.name)
                 message = 'ออกห้องไปแล้ว'
                 await self.noti(member, before, message)
 
