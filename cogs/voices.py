@@ -123,7 +123,7 @@ class Voices(commands.Cog):
                 if len(before.channel.members) == 0:
                     await before.channel.delete()
                     room_no -= 1
-                else:
+                elif len(before.channel.members) >0:
                     message = 'ออกห้องไปแล้ว'
                     await self.noti(member, before, message)
             else:
