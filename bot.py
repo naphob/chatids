@@ -16,7 +16,7 @@ load_dotenv()
 TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.all()
 # bot = bridge.Bot(command_prefix='!', intents=intents)
-bot = commands.Bot()
+bot = commands.Bot(intents=intents)
 cogs_list = [
     'welcomes',
     'voices',
