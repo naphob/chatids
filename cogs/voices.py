@@ -100,7 +100,10 @@ class Voices(commands.Cog):
             match = re.match(regex, before.channel.name)
             after_match = re.match(regex, after.channel.name)
             if before.channel is not None and match :
+                console.log(f"channel members before: {len(before.channel.members)}")
                 if len(before.channel.members) == 0:
+                    console.log(f"channel members after left channel: {len(before.channel.members)}")
+                    console.log(f"{before.channel.name} is deleted")
                     await before.channel.delete()
                     room_no -= 1
             elif after.channel.id == 1147446860961816648:
@@ -109,7 +112,7 @@ class Voices(commands.Cog):
                 if temp_channel is not None:
                     await member.move_to(temp_channel)
             elif after_match is None:
-                print(match)
+                console.log(match)
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
         elif after.channel and before.afk and not after.afk and not member.bot:
@@ -120,7 +123,10 @@ class Voices(commands.Cog):
             # A user left the voice channel
             match = re.match(regex, before.channel.name)
             if match :
+                console.log(f"channel members before: {len(before.channel.members)}")
                 if len(before.channel.members) == 0:
+                    console.log(f"channel members after left channel: {len(before.channel.members)}")
+                    console.log(f"{before.channel.name} is deleted")
                     await before.channel.delete()
                     room_no -= 1
                 elif len(before.channel.members) >0:
