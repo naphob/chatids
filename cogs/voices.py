@@ -126,15 +126,18 @@ class Voices(commands.Cog):
                 console.log(f"channel members before: {len(before.channel.members)}")
                 if len(before.channel.members) == 0:
                     console.log(f"channel members after left channel: {len(before.channel.members)}")
+                    console.log(f"{before.channel.member} left channel {before.channel.name}")
                     console.log(f"{before.channel.name} is deleted")
                     await before.channel.delete()
                     room_no -= 1
-                elif len(before.channel.members) >0:
+                elif len(before.channel.members) > 0 or before.channel.id != 1147446860961816648 :
                     message = 'ออกห้องไปแล้ว'
                     await self.noti(member, before, message)
+                    console.log(f"channel members after left channel: {len(before.channel.members)-1}")
             else:
                 message = 'ออกห้องไปแล้ว'
                 await self.noti(member, before, message)
+                console.log(f"channel members after left channel: {len(before.channel.members)-1}")
 
     @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
