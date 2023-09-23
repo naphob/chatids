@@ -156,9 +156,9 @@ class Welcomes(commands.Cog):
             color=discord.Color.dark_purple()
         )
         rule = "1. เปลี่ยนชื่อ : `ชื่อเล่น [ชื่อในเกม]`\nตัวอย่างการเปลี่ยนชื่อ : `Poon [CaptainWolffe]`\n2. กดรับยศเพื่อเห็นห้องของเกมที่จะเล่น"
-        embed.add_field(name="รับยสได้ด้วยตัวเอง", value=rule, inline=False)
+        embed.add_field(name="__รับยศได้ด้วยตัวเอง__", value=rule, inline=False)
 
-        embed.add_field(name="หรือพิมพ์เพื่อขอยศจากแอดมินในห้องนี้", value="",inline=False)
+        embed.add_field(name="__ขอยศจากแอดมิน__", value="พิมพ์แจ้งในห้องนี้",inline=False)
 
         await channel.send(embed=embed, file= discord.File('Asset/text.png'), view=Roles())
 
