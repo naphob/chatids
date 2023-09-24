@@ -126,7 +126,7 @@ class Voices(commands.Cog):
                 console.log(f"channel members before: {len(before.channel.members)}")
                 if len(before.channel.members) == 0:
                     console.log(f"channel members after left channel: {len(before.channel.members)}")
-                    console.log(f"{before.channel.member} left channel {before.channel.name}")
+                    # console.log(f"{before.channel.member} left channel {before.channel.name}")
                     console.log(f"{before.channel.name} is deleted")
                     await before.channel.delete()
                     room_no -= 1
