@@ -23,7 +23,7 @@ class Coins(commands.Cog):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         coin = amount
         if not user.bot:
-            await channel.send(f"<@{user.id}> recieved {coin} IDS Coins from {source}.")
+            await channel.send(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
             console.log(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
             user_coin = self.user.child(f"{user.id}").child('coin').get()
             if user_coin:
