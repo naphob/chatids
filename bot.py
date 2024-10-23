@@ -7,25 +7,25 @@ import firebase_admin
 from firebase_admin import credentials
 from cogs.welcomes import Roles, GetRoles
 from cogs.giveaways import MyView
-from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
+# from cogs.shops import NitroView, GiftCardView, ShipView, PaginatorView
 from cogs.casinos import RandomView, DiceView
 
 console = Console()
 console = Console()
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
-intents = discord.Intents.all()
-# bot = bridge.Bot(command_prefix='!', intents=intents)
-bot = commands.Bot(intents=intents)
 cogs_list = [
     'welcomes',
     'voices',
     'coins',
     'giveaways',
-    'shops',
+    # 'shops',
     'casinos',
-    'utils'
+    'utils',
 ]
+intents = discord.Intents.all()
+# bot = bridge.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 credential = os.getenv("FIREBASE_CREDENTIALS")
 DB_URL = os.getenv("DB_URL")
 UID = os.getenv("UID")
@@ -42,10 +42,10 @@ firebase_admin.initialize_app(cred, {
 async def on_ready():
         console.log(f'{bot.user.name} has connected to Discord!')
 
-        bot.add_view(Roles())
+        bot.add_view(Roles(bot))
         bot.add_view(GetRoles())
         bot.add_view(MyView(bot))
-        bot.add_view(PaginatorView())
+        # bot.add_view(PaginatorView())
         bot.add_view(RandomView(bot))
         bot.add_view(DiceView(bot))
 

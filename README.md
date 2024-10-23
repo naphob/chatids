@@ -1,5 +1,5 @@
 # chatids
-a discord bot that creates voice notification when a user joins a voice channel
+a discord bot for IDS organization of Star Citizen
 ## Features
 ### Vocie Notification & TTS
 - TTS voice notification when a user joins/moves or comeback from AFK stage.
