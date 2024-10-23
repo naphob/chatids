@@ -23,6 +23,7 @@ class infoModal(discord.ui.Modal):
     async def callback(self, interaction: discord.Interaction):
         user = interaction.user
         role = 1124564123640942673
+        new_member_role = 1177195777278361670
         nickname = self.children[0].value
         inGameName = self.children[1].value
         if role in [r.id for r in user.roles]:
@@ -34,6 +35,8 @@ class infoModal(discord.ui.Modal):
             else:
                 await user.edit(nick=f"{nickname} [{inGameName}]")
             await interaction.response.send_message("ชื่อของคุณได้ถูกเปลี่ยนแล้ว คุณจะเห็นห้องทั้งหมดที่เกี่ยวข้องกับ Star Citizen", ephemeral = True)
+        if new_member_role in [r.id for r in user.roles]:
+            await user.remove_roles(user.guild.get_role(new_member_role))
 
 
 class Roles(discord.ui.View):
