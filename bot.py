@@ -22,9 +22,9 @@ cogs_list = [
     # 'shops',
     'casinos',
     'utils',
+    'announces',
 ]
 intents = discord.Intents.all()
-# bot = bridge.Bot(command_prefix='!', intents=intents)
 bot = commands.Bot(command_prefix='!', intents=intents)
 credential = os.getenv("FIREBASE_CREDENTIALS")
 DB_URL = os.getenv("DB_URL")
