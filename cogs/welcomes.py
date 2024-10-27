@@ -220,6 +220,7 @@ class Welcomes(commands.Cog):
         await ctx.respond(embed=embed, view=Roles())
     
     @discord.slash_command(name="reg", description="Create a register button")
+    @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
     async def reg(self, ctx):
         embed = discord.Embed(
                 title = "📜      กฏการอยู่ร่วมกัน     📜",
@@ -229,6 +230,13 @@ class Welcomes(commands.Cog):
 
         await ctx.send(embed=embed, view=Roles(self.bot))
         await ctx.respond("สร้างข้อความที่ต้องการแล้ว", ephemeral = True)
+    
+    @reg.error
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.respond("คุณไม่สิทธิ์ใช้คำสั่งนี้!", ephemeral = True)
+        else:
+            raise error  # Here we raise other errors to ensure they aren't ignored
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Welcomes(bot)) # add the cog to the bot
