@@ -15,6 +15,13 @@ class Utils(commands.Cog):
         for member in channel.members:
             await member.move_to(after)
         await ctx.respond(f"Move all user to {after.mention}")
+    
+    @move_all.error
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.respond("คุณไม่สิทธิ์ใช้คำสั่งนี้!", ephemeral = True)
+        else:
+            raise error  # Here we raise other errors to ensure they aren't ignored
 
 
 def setup(bot): # this is called by Pycord to setup the cog
