@@ -134,7 +134,7 @@ class Voices(commands.Cog):
                     message = 'ออกห้องไปแล้ว'
                     await self.noti(member, before, message)
                     console.log(f"channel members after left channel: {len(before.channel.members)-1}")
-            else:
+            elif len(before.channel.members) > 0 :
                 message = 'ออกห้องไปแล้ว'
                 await self.noti(member, before, message)
                 console.log(f"channel members after left channel: {len(before.channel.members)-1}")
