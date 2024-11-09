@@ -84,7 +84,7 @@ class Roles(discord.ui.View):
     #             await interaction.response.send_message("กรุณาเปลี่ยนชื่อให้ถูกต้องตามกฎ เช่น Poon [CaptainWolffe]", ephemeral = True)
         
     @discord.ui.button(label="ยอมรับกฎเพื่อแสดงห้องทั้งหมด", custom_id="register", style=discord.ButtonStyle.primary)
-    async def button_callback_guest(self, button, interaction):
+    async def button_callback_guest(self, interaction):
         role = 1124564123640942673
         user = interaction.user
         modal = infoModal(self.bot, title="แจ้งข้อมูลเพื่อแสดงห้องทั้งหมด")

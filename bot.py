@@ -11,7 +11,6 @@ from cogs.giveaways import MyView
 from cogs.casinos import RandomView, DiceView
 
 console = Console()
-console = Console()
 load_dotenv()
 TOKEN = os.getenv("TOKEN")
 cogs_list = [
