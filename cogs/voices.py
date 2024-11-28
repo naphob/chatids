@@ -111,7 +111,7 @@ class Voices(commands.Cog):
                 temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
                 if temp_channel is not None:
                     await member.move_to(temp_channel)
-            elif before.channel is not None and after_match is None:
+            elif not after_match:
                 console.log(match)
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
