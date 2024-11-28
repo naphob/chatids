@@ -115,7 +115,7 @@ class Voices(commands.Cog):
                 console.log(match)
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
-        elif before.channel is not None and after_match is not None:
+        elif before.channel is not None and after.channel is not None:
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
         elif after.channel and before.afk and not after.afk and not member.bot:
