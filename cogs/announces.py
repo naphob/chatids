@@ -45,6 +45,19 @@ class Announces(commands.Cog):
             await ctx.respond("คุณไม่สิทธิ์ใช้คำสั่งนี้!", ephemeral = True)
         else:
             raise error  # Here we raise other errors to ensure they aren't ignored
+    
+    @discord.slash_command(name="post", description="post an announcement to text channel")
+    @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
+    async def post(self, ctx):
+        modal = AnnouceModal(self.bot, ctx.channel, title="ประกาศ")
+        await ctx.send_modal(modal)
+    
+    @post.error
+    async def on_application_command_error(self, ctx: discord.ApplicationContext, error: discord.DiscordException):
+        if isinstance(error, commands.MissingAnyRole):
+            await ctx.respond("คุณไม่สิทธิ์ใช้คำสั่งนี้!", ephemeral = True)
+        else:
+            raise error  # Here we raise other errors to ensure they aren't ignored
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(Announces(bot)) # add the cog to the bot
