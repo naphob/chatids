@@ -1,4 +1,3 @@
-import re
 import random
 import discord
 from discord.ext import commands
@@ -80,67 +79,26 @@ class Voices(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        global room_no
-        regex = "🚀Gaming\s\d+$"
-        if before.channel is None and after.channel is not None and not after.afk and not member.bot:
+        if before.channel is None and after.channel is not None and not after.afk and not member.bot and len(after.channel.members) > 1 :
             # A user joined a voice channel
-            if after.channel.id == 1147446860961816648:
-                room_no += 1
-                temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
-                if temp_channel is not None:
-                    await member.move_to(temp_channel)
-            else:
-                message = 'เข้ามาในห้องแล้ว'
-                await self.noti(member, after, message)
-                coins = self.bot.get_cog('Coins')
-                coin = random.random()
-                await coins.mint_coin(member, coin, "joining vc")
-        elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot:
+            message = 'เข้ามาในห้องแล้ว'
+            await self.noti(member, after, message)
+            coins = self.bot.get_cog('Coins')
+            coin = random.random()
+            await coins.mint_coin(member, coin, "joining vc")
+        elif after.channel and not before.suppress and not before.deaf and not before.mute and not before.self_mute and not before.self_stream and not before.self_video and not before.self_deaf and not after.self_mute and not after.self_stream and not after.self_video and not after.self_deaf and not after.deaf and not after.mute and not after.suppress and not member.bot and len(after.channel.members) > 1 :
             # A user moved to another voice channel
-            match = re.match(regex, before.channel.name)
-            after_match = re.match(regex, after.channel.name)
-            if before.channel is not None and match :
-                console.log(f"channel members before: {len(before.channel.members)}")
-                if len(before.channel.members) == 0:
-                    console.log(f"channel members after left channel: {len(before.channel.members)}")
-                    console.log(f"{before.channel.name} is deleted")
-                    await before.channel.delete()
-                    room_no -= 1
-            elif after.channel.id == 1147446860961816648:
-                room_no += 1
-                temp_channel = await after.channel.clone(name=f"🚀Gaming 0{room_no}")
-                if temp_channel is not None:
-                    await member.move_to(temp_channel)
-                console.log(match)
-            elif before.channel != after.channel:
-                console.log(f'{before} and {after}')
+            if before.channel != after.channel:
                 message = 'ย้ายมาในห้องนี้แล้ว'
                 await self.noti(member, after, message)
-        elif after.channel and before.afk and not after.afk and not member.bot:
+        elif after.channel and before.afk and not after.afk and not member.bot and len(after.channel.members) > 1 :
             # A user's back from AFK to voice channel
             message = 'กลับมาจาก AFK แล้ว'
             await self.noti(member, after, message)
-        elif after.channel is None and before.channel is not None and  not before.afk  and not member.bot:
+        elif after.channel is None and before.channel is not None and  not before.afk  and not member.bot and len(before.channel.members) > 0 :
             # A user left the voice channel
-            match = re.match(regex, before.channel.name)
-            if match :
-                console.log(f"channel members before: {len(before.channel.members)}")
-                if len(before.channel.members) == 0:
-                    console.log(f"channel members after left channel: {len(before.channel.members)}")
-                    # console.log(f"{before.channel.member} left channel {before.channel.name}")
-                    console.log(f"{before.channel.name} is deleted")
-                    await before.channel.delete()
-                    room_no -= 1
-                elif len(before.channel.members) > 0 or before.channel.id != 1147446860961816648 :
-                    message = 'ออกห้องไปแล้ว'
-                    await self.noti(member, before, message)
-                    console.log(f"channel members after left channel: {len(before.channel.members)-1}")
-            elif len(before.channel.members) > 0 :
-                message = 'ออกห้องไปแล้ว'
-                await self.noti(member, before, message)
-                console.log(f"channel members after left channel: {len(before.channel.members)-1}")
-        else:
-            return 
+            message = 'ออกห้องไปแล้ว'
+            await self.noti(member, before, message)
 
     @discord.slash_command(name='summon', description='This command will make the bot join the voice channel')
     async def summon(self, ctx):
