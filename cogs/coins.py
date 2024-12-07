@@ -87,7 +87,7 @@ class Coins(commands.Cog):
         embed.set_author(name="Bank of IDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
-            await ctx.respond(embed=embed)
+            await ctx.send_response(embed=embed, ephemeral = True)
             console.log(f"{user.display_name}'s balance: {coin:,.2f} IDS Coins.")
         else:
             await ctx.send_response("You have no IDS coins", ephemeral = True)
