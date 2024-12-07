@@ -84,7 +84,7 @@ class Coins(commands.Cog):
             description= f"Balance: `{coin:,.2f}`",
             title= f"{user.display_name}'s Wallet"
         )
-        embed.set_author(name="Bank of IDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
+        embed.set_author(name="Bank of IDS", icon_url="https://cdn.discordapp.com/attachments/1298700318179070033/1302313032554254360/IDS-01.png?ex=67547c06&is=67532a86&hm=83aa5b35dcec1b9346378b8f7d535dc787ab8fcf2f49befd4484749fbcdaf666&")
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
             await ctx.send_response(embed=embed, ephemeral = True)
@@ -105,7 +105,7 @@ class Coins(commands.Cog):
             color=discord.Color.dark_purple(),
             title="IDS Coin Transfer Transaction"
             )
-            embed.set_author(name="Bank of iDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
+            embed.set_author(name="Bank of iDS", icon_url="https://cdn.discordapp.com/attachments/1298700318179070033/1302313032554254360/IDS-01.png?ex=67547c06&is=67532a86&hm=83aa5b35dcec1b9346378b8f7d535dc787ab8fcf2f49befd4484749fbcdaf666&")
             embed.add_field(name="Sender", value=sender.display_name, inline=True)
             embed.add_field(name=":arrow_right:", value=f"`{amount}`", inline=True)
             embed.add_field(name="Recipient", value=receiver.display_name, inline=True)
@@ -130,7 +130,7 @@ class Coins(commands.Cog):
             color=discord.Color.dark_purple(),
             title= "The Richest Leaderboard"
         )
-        embed.set_author(name="Bank of iDS", icon_url="https://media.discordapp.net/attachments/1128316572134539305/1130354286900031499/imnanoart_an_illustration_of_a_space_logo_with_the_combination__62ac037c-ecee-4a48-a815-977746c10bd2.png?width=837&height=837")
+        embed.set_author(name="Bank of iDS", icon_url="https://cdn.discordapp.com/attachments/1298700318179070033/1302313032554254360/IDS-01.png?ex=67547c06&is=67532a86&hm=83aa5b35dcec1b9346378b8f7d535dc787ab8fcf2f49befd4484749fbcdaf666&")
         names = ''
         for rank, user in enumerate(leaderboard):
             if rank+1 == 1:
