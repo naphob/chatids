@@ -49,6 +49,8 @@ class VerificationView(discord.ui.View):
             })
             await user.add_roles(user.guild.get_role(role))
             await interaction.response.send_message(f"Your RSI handle `{self.rsi_handle}` has been successfully verified!", ephemeral=True)
+        elif user_data.get('verified'):
+            await interaction.response.send_message("ไอดีของคุณเคยได้รับการยืนยันแล้ว", ephemeral=True)
         else:
             await interaction.response.send_message("Verification failed. Please try again.", ephemeral=True)
 
@@ -57,7 +59,6 @@ class Verification(commands.Cog):
         self.bot = bot
         self.console = Console()
         self.user_ref = db.reference('users')
-        self.verify_code = secrets.token_hex(16) # Generate a 6-character verification code
 
     async def search_user(self, rsi_handle: str):
         """Search for a user by RSI handle."""
@@ -76,8 +77,9 @@ class Verification(commands.Cog):
     async def verify(self, ctx, rsi_handle: str):
         user_id = str(ctx.author.id)
         user_data = await self.search_user(rsi_handle)
+        verify_code = secrets.token_hex(16)
         if self.user_ref.child(user_id).get().get('verified'):
-            await ctx.send_response("ไอดีของคุณเคยได้รับการยืนยันแล้ว.", ephemeral=True)
+            await ctx.send_response("ไอดีของคุณเคยได้รับการยืนยันแล้ว", ephemeral=True)
             return
         elif user_data is None:
             await ctx.send_response(f"Failed to verify RSI handle {rsi_handle}", ephemeral=True)
@@ -89,13 +91,13 @@ class Verification(commands.Cog):
         self.user_ref.child(user_id).update({
             'rsi_handle': rsi_handle,
             'verified': False,
-            'verify_code': self.verify_code
+            'verify_code': verify_code
         })
         
 
         embed = discord.Embed(
             title="ยืนยันไอดี Star Citizen ของคุณ",
-            description=f"กรุณาล็อคอินไอดีของคุณที่ robertsspaceindustries.com และกรอก Verification Code \n```{self.verify_code}```\nในช่อง Short Bio\nหลังจากนั้นให้กดปุ่ม Verify เพื่อยืนยันตัวตนของคุณ",
+            description=f"กรุณาล็อคอินไอดีของคุณที่ robertsspaceindustries.com และกรอก Verification Code \n```{verify_code}```\nในช่อง Short Bio\nหลังจากนั้นให้กดปุ่ม Verify เพื่อยืนยันตัวตนของคุณ",
             color=discord.Color.dark_purple()
         )
 
