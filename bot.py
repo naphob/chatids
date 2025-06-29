@@ -22,7 +22,7 @@ cogs_list = [
     'casinos',
     'utils',
     'announces',
-    # 'youtube',
+    'verification',
 ]
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
