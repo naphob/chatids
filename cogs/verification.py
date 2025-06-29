@@ -77,7 +77,7 @@ class Verification(commands.Cog):
         user_id = str(ctx.author.id)
         user_data = await self.search_user(rsi_handle)
         if self.user_ref.child(user_id).get().get('verified'):
-            await ctx.send_response("ไอดีของคุณได้รับการยืนยันแล้ว.", ephemeral=True)
+            await ctx.send_response("ไอดีของคุณเคยได้รับการยืนยันแล้ว.", ephemeral=True)
             return
         elif user_data is None:
             await ctx.send_response(f"Failed to verify RSI handle {rsi_handle}", ephemeral=True)
