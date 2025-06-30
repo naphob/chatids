@@ -1,4 +1,5 @@
 import random
+import asyncio
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands, bridge
@@ -60,14 +61,33 @@ class Coins(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # bot_command = ["!balance", "!say", "!send", "!rec", "!summon", "!leave", "!give", "!stop"]
         user = message.author
         coin = random.random()
+        def check(reaction, user):
+            return str(reaction.emoji) == "💰" and not user.bot
+
         if message.type == discord.MessageType.premium_guild_subscription:
             await self.mint_coin(user, 150.0,"boosting the server")
         elif user.id != self.bot.user.id or not message.content.startswith('!'):
             await self.mint_coin(user, coin,"new message")
-        # await self.bot.process_commands(message)
+        
+        if user.id != self.bot.user.id and coin < 0.1:
+            reaction = await message.add_reaction("💰")
+            try:
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+
+                # await message.channel.send(f'🎉 {user.mention} ได้รับ 10 IDS Coin! 🎉')
+
+                await reaction.remove(user)
+                await reaction.remove(self.bot.user)
+            
+                await self.mint_coin(user, 10, "reaction")
+            except asyncio.TimeoutError:
+                print('Timeout: ไม่มีใครกด emoji ภายในเวลา')
+                
+                for reaction in message.reactions:
+                    if str(reaction.emoji) == "💰":
+                        await message.remove_reaction(reaction.emoji, self.bot.user)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
