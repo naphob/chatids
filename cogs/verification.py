@@ -1,7 +1,6 @@
 import os
 import secrets
 import discord
-import asyncio
 from dotenv import load_dotenv
 from discord.ext import commands
 from rich.console import Console

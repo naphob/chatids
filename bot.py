@@ -23,6 +23,7 @@ cogs_list = [
     'utils',
     'announces',
     'verification',
+    'playtime',
 ]
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)

@@ -63,6 +63,7 @@ class Coins(commands.Cog):
     async def on_message(self, message):
         user = message.author
         coin = random.random()
+        reward = 100
         def check(reaction, user):
             return str(reaction.emoji) == "💰" and not user.bot
 
@@ -71,20 +72,20 @@ class Coins(commands.Cog):
         elif user.id != self.bot.user.id or not message.content.startswith('!'):
             await self.mint_coin(user, coin,"new message")
         
-        if user.id != self.bot.user.id and coin < 0.1:
+        if user.id != self.bot.user.id and coin < 0.05:
             reaction = await message.add_reaction("💰")
             try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=30.0, check=check)
+                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
 
-                # await message.channel.send(f'🎉 {user.mention} ได้รับ 10 IDS Coin! 🎉')
+                await message.channel.send(f'🎉 ยินดีด้วย {user.mention} ได้รับ {reward} IDS Coin! 🎉')
 
                 await reaction.remove(user)
                 await reaction.remove(self.bot.user)
-            
-                await self.mint_coin(user, 10, "reaction")
+
+                await self.mint_coin(user, reward, "lucky bag of coins")
             except asyncio.TimeoutError:
-                print('Timeout: ไม่มีใครกด emoji ภายในเวลา')
-                
+                console.log('Timeout: ไม่มีใครกด emoji ภายในเวลา')
+
                 for reaction in message.reactions:
                     if str(reaction.emoji) == "💰":
                         await message.remove_reaction(reaction.emoji, self.bot.user)
