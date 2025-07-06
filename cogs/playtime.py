@@ -53,10 +53,14 @@ class Playtime(commands.Cog):
         name =''
         for i, (user_id, data) in enumerate(ranks):
             user = ctx.guild.get_member(int(user_id))
+            # If user is None, skip this user
             if user is None:
                 continue
             total_time = data.get('total_time', 0)
-            total_time = total_time if total_time else 0
+            # If total_time is None or 0, skip this user
+            if total_time is None or total_time == 0:
+                continue
+
             hours_played = total_time / 3600
             name += f"{i}. {user.display_name} : {hours_played:.2f} hours\n"
 
