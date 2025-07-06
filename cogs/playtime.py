@@ -1,10 +1,11 @@
 import time
 import discord
-from dotenv import load_dotenv
-from discord.ext import commands
+import pytz
+from datetime import datetime, timedelta
+import asyncio
+from discord.ext import commands, tasks
 from rich.console import Console
 from firebase_admin import db
-
 
 
 class Playtime(commands.Cog):
@@ -12,6 +13,7 @@ class Playtime(commands.Cog):
         self.bot = bot
         self.user = db.reference('users')
         self.console = Console()
+        self.reset_leaderboard_loop.start()
 
     @commands.Cog.listener()
     async def on_presence_update(self, before, after):
@@ -68,6 +70,52 @@ class Playtime(commands.Cog):
         embed.set_footer(text="ข้อมูลขั่วโมงการเล่นเกมจะถูกรีเซ็ตทุกสัปดาห์", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
 
         await ctx.respond(embed=embed)
+
+    # calculate the next reset time for the leaderboard
+    def calculate_next_reset_time(self):
+        # switch to the timezone of Bangkok
+        tz = pytz.timezone('Asia/Bangkok')
+        now = datetime.now(tz)
+
+        # calculate the next reset time
+        next_reset_time = now + timedelta(days=(6 - now.weekday()))  # finding the next Sunday
+        next_reset_time = next_reset_time.replace(hour=23, minute=59, second=0, microsecond=0)  # setting time to 11:59 PM
+
+        # if the current time is past the next reset time, set it to the next week
+        if now > next_reset_time:
+            next_reset_time += timedelta(weeks=1)
+
+        return next_reset_time
+
+    @tasks.loop(hours=168)  #excute every 168 hours (1 week)
+    async def reset_leaderboard_loop(self):
+        # calculate the next reset time
+        next_reset_time = self.calculate_next_reset_time()
+
+        # calculate the time until the next reset
+        time_until_reset = next_reset_time - datetime.now(pytz.timezone('Asia/Bangkok'))
+        self.console.log(f"Next reset will occur at {next_reset_time} (GMT+7)")
+
+        # wait until the reset time
+        await asyncio.sleep(time_until_reset.total_seconds())  # wait until the reset time
+
+        # reset the leaderboard
+        leaderboard_ref = db.reference('users')  # find the database that stores player playtime
+
+        # remove total_time for all users
+        users_data = leaderboard_ref.get()  # get all user data
+        for user_id, data in users_data.items():
+            if 'total_time' in data:
+                user_ref = leaderboard_ref.child(user_id)
+                user_ref.child('total_time').remove()  # remove total_time for user
+
+        # send a message to the Discord channel
+        channel = self.bot.get_channel(1127257320473251840)  # enter the ID of the Discord channel you want to send the message to
+        await channel.send("Leaderboard has been reset for the new week! ⏰")
+        self.console.log("Leaderboard has been reset for the new week! ⏰")
+
+        # set the next loop interval (make it repeat every 1 week)
+        self.reset_leaderboard_loop.change_interval(hours=168)  # set loop to run every 168 hours (1 week)
 
 def setup(bot):  # this is called by Pycord to setup the cog
     bot.add_cog(Playtime(bot))  # add the cog to the bot
