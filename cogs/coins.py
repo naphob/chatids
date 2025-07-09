@@ -6,7 +6,6 @@ from discord.ext import commands, bridge
 from rich.console import Console
 from firebase_admin import db
 
-console = Console()
 load_dotenv()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
 
@@ -16,6 +15,7 @@ class Coins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.user = db.reference('users')
+        self.console = Console()
 
     def get_user(self):
         return self.user
@@ -72,7 +72,7 @@ class Coins(commands.Cog):
         elif user.id != self.bot.user.id or not message.content.startswith('!'):
             await self.mint_coin(user, coin,"new message")
         
-        if user.id != self.bot.user.id and coin < 0.05:
+        if user.id != self.bot.user.id and coin < 0.01:
             reaction = await message.add_reaction("💰")
             try:
                 reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
@@ -84,7 +84,7 @@ class Coins(commands.Cog):
 
                 await self.mint_coin(user, reward, "lucky bag of coins")
             except asyncio.TimeoutError:
-                console.log('Timeout: ไม่มีใครกด emoji ภายในเวลา')
+                self.console.log('Timeout: ไม่มีใครกด emoji ภายในเวลา')
 
                 for reaction in message.reactions:
                     if str(reaction.emoji) == "💰":
@@ -134,7 +134,7 @@ class Coins(commands.Cog):
             # await ctx.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
             await ctx.respond(embed=embed)
             await channel.send(f"<@{sender.id}> transfered {amount} IDS Coins to <@{receiver.id}>.")
-            console.log(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
+            self.console.log(f"{sender.display_name} transfered {amount} IDS Coins to {receiver.display_name}.")
         else:
             await ctx.send_response("Insufficient IDS coin balance or wrong amount", ephemeral = True)
 
