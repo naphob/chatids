@@ -38,9 +38,6 @@ firebase_admin.initialize_app(cred, {
     }
 })
 
-for cog in cogs_list:
-    bot.load_extension(f'cogs.{cog}')
-
 @bot.event
 async def on_ready():
         
@@ -57,5 +54,9 @@ async def on_ready():
         for guild in bot.guilds:
             # PRINT THE SERVER'S ID AND NAME.
             console.log(f"- {guild.id} | {guild.name}")
+
+
+for cog in cogs_list:
+    bot.load_extension(f'cogs.{cog}')
 
 bot.run(TOKEN)

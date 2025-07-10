@@ -6,8 +6,7 @@ from discord.ext import commands, bridge
 from rich.console import Console
 from firebase_admin import db
 
-load_dotenv()
-LOG_TEXT_CHANNEL_ID = 1127257320473251840
+
 
 # ref = db.reference('users')
 
@@ -16,16 +15,18 @@ class Coins(commands.Cog):
         self.bot = bot
         self.user = db.reference('users')
         self.console = Console()
+        self.laod_dotenv = load_dotenv()
+        self.LOG_TEXT_CHANNEL_ID = 1127257320473251840
 
     def get_user(self):
         return self.user
 
     async def mint_coin(self, user, amount, source):
-        channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
+        channel = await self.bot.fetch_channel(self.LOG_TEXT_CHANNEL_ID)
         coin = amount
         if not user.bot:
             await channel.send(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
-            console.log(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
+            self.console.log(f"{user.display_name} recieved {coin} IDS Coins from {source}.")
             user_coin = self.user.child(f"{user.id}").child('coin').get()
             if user_coin:
                 coin += user_coin
@@ -58,12 +59,34 @@ class Coins(commands.Cog):
                 })
             return remaining_amount
 
+    async def add_reaction(self,message,emoji,reward):
+        user = message.author
+
+        def check(reaction, user):
+            return str(reaction.emoji) == emoji and not user.bot
+
+        reaction = await message.add_reaction(emoji)
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
+
+            await message.channel.send(f'🎉 ยินดีด้วย {user.mention} ได้รับ {reward} IDS Coin! 🎉')
+
+            await reaction.remove(user)
+            await reaction.remove(self.bot.user)
+
+            await self.mint_coin(user, reward, "lucky bag of coins")
+        except asyncio.TimeoutError:
+            self.console.log('Timeout: ไม่มีใครกด emoji ภายในเวลา')
+
+            for reaction in message.reactions:
+                if str(reaction.emoji) == emoji:
+                    await message.remove_reaction(reaction.emoji, self.bot.user)
 
     @commands.Cog.listener()
     async def on_message(self, message):
         user = message.author
         coin = random.random()
-        reward = 100
+        # reward = 100
         def check(reaction, user):
             return str(reaction.emoji) == "💰" and not user.bot
 
@@ -72,23 +95,15 @@ class Coins(commands.Cog):
         elif user.id != self.bot.user.id or not message.content.startswith('!'):
             await self.mint_coin(user, coin,"new message")
         
-        if user.id != self.bot.user.id and coin < 0.01:
-            reaction = await message.add_reaction("💰")
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
-
-                await message.channel.send(f'🎉 ยินดีด้วย {user.mention} ได้รับ {reward} IDS Coin! 🎉')
-
-                await reaction.remove(user)
-                await reaction.remove(self.bot.user)
-
-                await self.mint_coin(user, reward, "lucky bag of coins")
-            except asyncio.TimeoutError:
-                self.console.log('Timeout: ไม่มีใครกด emoji ภายในเวลา')
-
-                for reaction in message.reactions:
-                    if str(reaction.emoji) == "💰":
-                        await message.remove_reaction(reaction.emoji, self.bot.user)
+        if user.id != self.bot.user.id:
+            if coin < 0.05:
+                emoji = "🪙"
+                reward = 10
+                await self.add_reaction(message,emoji,reward)
+            elif coin < 0.01:
+                emoji = "💰"
+                reward = 100
+                await self.add_reaction(message,emoji,reward)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
@@ -109,7 +124,7 @@ class Coins(commands.Cog):
         embed.set_thumbnail(url="https://upload.wikimedia.org/wikipedia/commons/d/d6/Gold_coin_icon.png")
         if coin:
             await ctx.send_response(embed=embed, ephemeral = True)
-            console.log(f"{user.display_name}'s balance: {coin:,.2f} IDS Coins.")
+            self.console.log(f"{user.display_name}'s balance: {coin:,.2f} IDS Coins.")
         else:
             await ctx.send_response("You have no IDS coins", ephemeral = True)
 
