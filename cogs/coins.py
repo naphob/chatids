@@ -60,7 +60,6 @@ class Coins(commands.Cog):
             return remaining_amount
 
     async def add_reaction(self,message,emoji,reward):
-        user = message.author
 
         def check(reaction, user):
             return str(reaction.emoji) == emoji and not user.bot
@@ -86,9 +85,6 @@ class Coins(commands.Cog):
     async def on_message(self, message):
         user = message.author
         coin = random.random()
-        # reward = 100
-        def check(reaction, user):
-            return str(reaction.emoji) == "💰" and not user.bot
 
         if message.type == discord.MessageType.premium_guild_subscription:
             await self.mint_coin(user, 150.0,"boosting the server")
