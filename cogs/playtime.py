@@ -17,7 +17,7 @@ class Playtime(commands.Cog):
 
     @commands.Cog.listener()
     async def on_presence_update(self, before, after):
-         if before.activity != after.activity:
+        if before.activity != after.activity:
             if after.activity and after.activity.name == "Star Citizen":
                 # record the start time when the user starts playing Star Citizen
                 user_id = str(after.id)
@@ -107,7 +107,7 @@ class Playtime(commands.Cog):
         for user_id, data in users_data.items():
             if 'total_time' in data:
                 user_ref = leaderboard_ref.child(user_id)
-                user_ref.child('total_time').remove()  # remove total_time for user
+                user_ref.child('total_time').delete()  # remove total_time for user
 
         # send a message to the Discord channel
         channel = self.bot.get_channel(1127257320473251840)  # enter the ID of the Discord channel you want to send the message to
