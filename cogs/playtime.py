@@ -67,7 +67,7 @@ class Playtime(commands.Cog):
             name += f"{i}. {user.display_name} : {hours_played:.2f} hours\n"
 
         embed.add_field(name="Names", value=name, inline=False)
-        embed.set_footer(text="ข้อมูลขั่วโมงการเล่นเกมจะถูกรีเซ็ตทุกสัปดาห์", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
+        embed.set_footer(text=f"ข้อมูลขั่วโมงการเล่นเกมจะถูกรีเซ็ตอีกครั้งในวันที่ {self.calculate_next_reset_time().strftime('%Y-%m-%d %H:%M:%S')} (GMT+7)", icon_url="https://cdn-icons-png.flaticon.com/512/4201/4201973.png")
 
         await ctx.respond(embed=embed)
 
@@ -79,7 +79,7 @@ class Playtime(commands.Cog):
 
         # calculate the next reset time
         next_reset_time = now + timedelta(days=(6 - now.weekday()))  # finding the next Sunday
-        next_reset_time = next_reset_time.replace(hour=23, minute=59, second=0, microsecond=0)  # setting time to 11:59 PM
+        next_reset_time = next_reset_time.replace(hour=23, minute=59, second=59, microsecond=0)  # setting time to 11:59 PM
 
         # if the current time is past the next reset time, set it to the next week
         if now > next_reset_time:

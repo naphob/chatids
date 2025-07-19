@@ -65,6 +65,7 @@ class Coins(commands.Cog):
             return str(reaction.emoji) == emoji and not user.bot
 
         reaction = await message.add_reaction(emoji)
+        
         try:
             reaction, user = await self.bot.wait_for('reaction_add', timeout=60.0, check=check)
 
