@@ -3,7 +3,7 @@ import discord.ui
 from discord.ext import commands
 
 class AnnouceModal(discord.ui.Modal):
-    def __init__(self, bot, channel:discord.TextChannel, *args, **kwargs) -> None:
+    def __init__(self, bot, channel: discord.TextChannel, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs, timeout=None)
         self.bot = bot
         self.channel = channel

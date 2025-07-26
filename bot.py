@@ -55,7 +55,6 @@ async def on_ready():
             # PRINT THE SERVER'S ID AND NAME.
             console.log(f"- {guild.id} | {guild.name}")
 
-
 for cog in cogs_list:
     bot.load_extension(f'cogs.{cog}')
 
