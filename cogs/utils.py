@@ -36,13 +36,14 @@ class Utils(commands.Cog):
     @discord.slash_command(name='evacuate', description='Create a temporary voice channel and move specified users')
     @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
     async def evacuate(self, ctx, channel: discord.VoiceChannel, target_user: discord.Member):
-        # Create a temporary voice channel
-        temp_channel = await ctx.guild.create_voice_channel(name=f"อพยพ", category=channel.category, reason="Temporary evacuation channel")
 
         # Move specified users to the temporary channel
         if len(channel.members) - 1 == 0:
             await ctx.respond("No users in the specified channel to evacuate.", ephemeral=True)
             return
+        # Create a temporary voice channel
+        temp_channel = await ctx.guild.create_voice_channel(name=f"อพยพ", category=channel.category, reason="Temporary evacuation channel")
+        
         for member in channel.members:
             if member == target_user:
                 continue
