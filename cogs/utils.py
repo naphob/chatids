@@ -29,9 +29,11 @@ class Utils(commands.Cog):
     @discord.slash_command(name='nuke', description='Command to Kick all user from voice channel')
     @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
     async def nuke(self, ctx, channel: discord.VoiceChannel): # default reason is none so that it is optional in the slash command
+        log_channel = await self.bot.fetch_channel(1127257320473251840)
         for member in channel.members:
             await member.move_to(None)
         await ctx.respond(f"All users have been kicked from {channel.mention}", ephemeral = True)
+        await log_channel.send(f"{ctx.user} ได้ยิงนุ๊กที่ห้อง {channel.mention} แล้ว")
 
     @discord.slash_command(name='evacuate', description='Create a temporary voice channel and move specified users')
     @commands.has_any_role(1008638970911002684, 1037741810749030511, 1123808015536111616)
@@ -43,7 +45,7 @@ class Utils(commands.Cog):
             return
         # Create a temporary voice channel
         temp_channel = await ctx.guild.create_voice_channel(name=f"อพยพ", category=channel.category, reason="Temporary evacuation channel")
-        
+
         for member in channel.members:
             if member == target_user:
                 continue
