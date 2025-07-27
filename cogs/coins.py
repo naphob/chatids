@@ -2,7 +2,7 @@ import random
 import asyncio
 import discord
 from dotenv import load_dotenv
-from discord.ext import commands, bridge
+from discord.ext import commands
 from rich.console import Console
 from firebase_admin import db
 
