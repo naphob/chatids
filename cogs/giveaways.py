@@ -70,6 +70,7 @@ class MyView(discord.ui.View):
                 embed.set_image(url="https://robertsspaceindustries.com/media/kh65mcqfdj5j0r/slideshow/GiftCard_10Dollars_FINAL-1-Min.png")
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
                 await channel.send(f"<@{user.id}> got Star Citizen gift card from giveaway")
+                await interaction.channel.send(f"🎉 ยินดีด้วย 🎉<@{user.id}> got Star Citizen gift card from giveaway")
                 console.log(f"{user.display_name} got Star Citizen gift card from giveaway")
             elif result == 'miner_pack':
                 await coins.mint_coin(user, coin, "giveaway")
@@ -78,6 +79,7 @@ class MyView(discord.ui.View):
                 embed.set_image(url="https://robertsspaceindustries.com/i/b2ead2c1836d12f273851edc8cd33ea3eb7b42cf/resize(910,512,cover,ADdPNihJzmPbNuTnFsH1DqUeqBRpXdSXVVtgJTyDDgscGKrzJuoFjReseHAbaLQcuxXnjfkVH9umUvGrGRsxv5xkW)/source.webp")
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
                 await channel.send(f"<@{user.id}> got Star Citizen Miner Starter Pack from giveaway")
+                await interaction.channel.send(f"🎉 ยินดีด้วย 🎉<@{user.id}> got Star Citizen Miner Starter Pack from giveaway")
                 console.log(f"{user.display_name} got Star Citizen Miner Starter Pack from giveaway")
 
             recipients.append(user.id)
@@ -124,7 +126,7 @@ class Giveaways(commands.Cog):
                 description = "เนื่องในโอกาสครบรอบ 3 ปี IDS discord server วันที่ 3 สิงหาคม 2025 ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
                 color = discord.Color.dark_purple()
             )
-            rewards = "1.`Star Citizen Miner Starter Pack มูลค่า $75` x 1 รางวัล\n2. `Star Citizen Gift Card มูลค่า $10` x 3 รางวัล\n3. `333 IDS Coins`"
+            rewards = "1. `Star Citizen Miner Starter Pack มูลค่า $75` x 1 รางวัล\n2. `Star Citizen Gift Card มูลค่า $10` x 3 รางวัล\n3. `333 IDS Coins`"
             remark = "1. สามารถกดรับรางวัลได้คนละ 1 ครั้งเท่านั้นและกิจกรรมจะจบลงภายในวันที่ 3 สิงหาคม 2025 เวลา 23.59 น.\n2. รางวัลในข้อ 3 จะได้รับทุกคน\n3. ผู้ได้รับรางวัลในข้อ 1 และ 2 จะต้องแจ้งอีเมลที่ใช้เล่นเกมกับแอดมินเพื่อใช้สำหรับการมอบของรางวัล\n4. ทีมงานสงวนสิทธิ์ในการแก้ไขเปลี่ยนแปลงรางวัลโดยไม่แจ้งให้ทราบล่วงหน้า\n5. รางวัลในทุกข้อไม่สามารถแลกเปลี่ยนเป็นเงินจริงได้"
             embed.add_field(name="รางวัล", value=rewards, inline=False)
             embed.add_field(name="เงื่อนไข", value=remark, inline=False)
