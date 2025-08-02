@@ -1,31 +1,60 @@
 import discord
 from discord.ext import commands
-from random import randrange
+import random
 from rich.console import Console
+from firebase_admin import db
 
 console = Console()
 LOG_TEXT_CHANNEL_ID = 1127257320473251840
-recipients = []
-reward_pool = []
+
+
 
 class MyView(discord.ui.View):
     def __init__(self, bot):
         super().__init__(timeout=None)
         self.bot = bot
+        self.coins = bot.get_cog('Coins')
+        self.user = self.coins.get_user()
+        # self.reward_pool = self.load_reward_pool()
+        # self.recipients = self.load_recipients()
 
-    @discord.ui.button(label="รับรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=True)
+    def load_reward_pool(self):
+        """โหลด reward_pool จาก Firebase"""
+        reward_pool_ref = db.reference('giveaway/reward_pool')
+        return reward_pool_ref.get()
+
+    def load_recipients(self):
+        """โหลด recipients จาก Firebase ทุกครั้ง"""
+        recipients_ref = db.reference('giveaway/recipients')
+        return recipients_ref.get() or []
+
+    def update_reward_pool(self, reward_pool):
+        """อัปเดต reward_pool ใน Firebase"""
+        reward_pool_ref = db.reference('giveaway/reward_pool')
+        reward_pool_ref.set(reward_pool)  # อัปเดต reward_pool
+        console.log(f"Updated reward pool: {reward_pool}")
+
+    def update_recipients(self, recipients):
+        """อัปเดต recipients ใน Firebase"""
+        recipients_ref = db.reference('giveaway/recipients')
+        recipients_ref.set(recipients)  # อัปเดต recipients
+        console.log(f"Updated recipients: {recipients}")
+
+    @discord.ui.button(label="สุ่มรางวัล", custom_id="random", style=discord.ButtonStyle.primary, emoji="🎉", disabled=False)
     async def button_callback(self, button, interaction):
         channel = await self.bot.fetch_channel(LOG_TEXT_CHANNEL_ID)
         user = interaction.user
         coins = self.bot.get_cog('Coins')
-        coin = 500.0
+        coin = 333.0
         embed = discord.Embed(
-            title = "🎊 กิจกรรมฉลองครบรอบ 1 ปี 🎊",
-                description = "เนื่องในโอกาสครบรอบ 1 ปี IDS discord server วันที่ 3 สิงหาคม ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
+            title = "🎊 กิจกรรมฉลองครบรอบ 3 ปี IDS 🎊",
+                description = "เนื่องในโอกาสครบรอบ 3 ปี IDS discord server วันที่ 3 สิงหาคม 2025 ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
                 color = discord.Color.dark_red()
         )
 
-        if user in recipients:
+        recipients = self.load_recipients()
+
+        if user.id in recipients:
             await interaction.response.send_message("คุณเคยรับของรางวัลแล้ว", ephemeral = True)
         else:
             result = self.reward_random()
@@ -34,7 +63,7 @@ class MyView(discord.ui.View):
                 rewards = f"`{coin} IDS Coins`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
                 await interaction.response.send_message(embed=embed, ephemeral = True)
-            elif result == 'star citizen':
+            elif result == 'gift_card':
                 await coins.mint_coin(user, coin, "giveaway")
                 rewards = f"1. `{coin} IDS Coins`\n2. `Star Citizen Gift Card มูลค่า $10`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
@@ -42,30 +71,46 @@ class MyView(discord.ui.View):
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
                 await channel.send(f"<@{user.id}> got Star Citizen gift card from giveaway")
                 console.log(f"{user.display_name} got Star Citizen gift card from giveaway")
-            elif result == 'nitro':
+            elif result == 'miner_pack':
                 await coins.mint_coin(user, coin, "giveaway")
-                with open("nitro.txt", "r") as f:
-                    lines = f.readlines()
-                    nitro = lines[0]
-                rewards = f"1. `{coin} IDS Coins`\n2. `Discord Nitro Gift Card 1 Month มูลค่า $9.99`\n||{nitro}||"
+                rewards = f"1. `{coin} IDS Coins`\n2. `Star Citizen Miner Starter Pack มูลค่า $75`"
                 embed.add_field(name="รางวัลที่ได้รับ", value=rewards, inline=False)
+                embed.set_image(url="https://robertsspaceindustries.com/i/b2ead2c1836d12f273851edc8cd33ea3eb7b42cf/resize(910,512,cover,ADdPNihJzmPbNuTnFsH1DqUeqBRpXdSXVVtgJTyDDgscGKrzJuoFjReseHAbaLQcuxXnjfkVH9umUvGrGRsxv5xkW)/source.webp")
                 await interaction.response.send_message("ขอบคุณที่มาร่วมสนุกกับ IDS ยินดีด้วยนี่คือรางวัลของคุณ",embed=embed, ephemeral = True)
-                await channel.send(f"<@{user.id}> got Nitro from giveaway")
-                console.log(f"{user.display_name} got Nitro from giveaway")
-                with open('nitro.txt', 'r+', encoding='utf-8') as txt_file:
-                    lines = txt_file.readlines()
-                    txt_file.seek(0)
-                    if len(lines):
-                        for i, line in enumerate(lines):
-                            if 1 <= i:
-                                txt_file.write(line)
-                        txt_file.truncate()
+                await channel.send(f"<@{user.id}> got Star Citizen Miner Starter Pack from giveaway")
+                console.log(f"{user.display_name} got Star Citizen Miner Starter Pack from giveaway")
 
-            recipients.append(user)
+            recipients.append(user.id)
+            self.update_recipients(recipients)  # อัปเดต recipients หลังจากที่มีการรับรางวัลแล้ว
+
     def reward_random(self):
-        global reward_pool
-        result = reward_pool.pop(randrange(len(reward_pool)))
-        return result
+        """สุ่มรางวัลโดยใช้ความน่าจะเป็น และตรวจสอบจำนวนรางวัลที่เหลือ"""
+        reward_pool = self.load_reward_pool()
+
+        reward_chances = {
+            'coin': 96,             
+            'gift_card': 3,     
+            'miner_pack': 1   
+        }
+
+        # ตรวจสอบว่ามีรางวัลเหลืออยู่หรือไม่
+        available_rewards = {reward: chance for reward, chance in reward_chances.items() if reward_pool.get(reward, 0) > 0}
+
+        if not available_rewards:
+            return None  # ถ้าไม่มีรางวัลเหลือเลย
+
+        # สุ่มรางวัลจากรางวัลที่เหลือ
+        random_choice = random.choices(
+            population=list(available_rewards.keys()), 
+            weights=list(available_rewards.values()), 
+            k=1
+        )[0]
+
+        # ลดจำนวนรางวัลที่เหลือ
+        reward_pool[random_choice] -= 1
+        self.update_reward_pool(reward_pool)  # อัปเดต Firebase หลังจากลดจำนวนรางวัล
+
+        return random_choice
 
 class Giveaways(commands.Cog):
     def __init__(self, bot):
@@ -75,21 +120,22 @@ class Giveaways(commands.Cog):
     async def giveaway(self, ctx):
         if ctx.author.id == 855426672806199336:
             embed = discord.Embed(
-                title = "🎊 กิจกรรมฉลองครบรอบ 1 ปี 🎊",
-                description = "เนื่องในโอกาสครบรอบ 1 ปี IDS discord server วันที่ 3 สิงหาคม ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
+                title = "🎊 กิจกรรมฉลองครบรอบ 3 ปี 🎊",
+                description = "เนื่องในโอกาสครบรอบ 3 ปี IDS discord server วันที่ 3 สิงหาคม 2025 ทีมงาน IDS มีกิจกรรมแจกของรางวัลให้สมาชิกทุกท่านดังนี้",
                 color = discord.Color.dark_purple()
             )
-            rewards = "1. `500 IDS Coins`\n2. `Discord Nitro Gift Card 1 Month มูลค่า $9.99` x 3 รางวัล\n3. `Star Citizen Gift Card มูลค่า $10` x 2 รางวัล"
-            remark = "1. สามารถกดรับรางวัลได้คนละ 1 ครั้งเท่านั้นและกิจกรรมจะจบลงภายในวันที่ 3 สิงหาคม เวลา 23.59 น.\n2. รางวัลในข้อ 1 จะได้รับทุกคน และรางวัลในข้อ 2 และ 3 จะเป็นการสุ่ม\n3. รางวัลในข้อ 2 จะได้รับเป็นโค้ด สามารถนำไปเติมได้ในดิสคอร์ดด้วยตัวเอง\n4. ผู้ได้รับรางวัลในข้อ 3 จะต้องแจ้งอีเมลที่ใช้เล่นเกมกับแอดมินเพื่อใช้สำหรับการมอบของรางวัล\n5. ทีมงานสงวนสิทธิ์ในการแก้ไขเปลี่ยนแปลงรางวัลโดยไม่แจ้งให้ทราบล่วงหน้า\n6. รางวัลในทุกข้อไม่สามารถแลกเปลี่ยนเป็นเงินจริงได้"
+            rewards = "1.`Star Citizen Miner Starter Pack มูลค่า $75` x 1 รางวัล\n2. `Star Citizen Gift Card มูลค่า $10` x 3 รางวัล\n3. `333 IDS Coins`"
+            remark = "1. สามารถกดรับรางวัลได้คนละ 1 ครั้งเท่านั้นและกิจกรรมจะจบลงภายในวันที่ 3 สิงหาคม เวลา 23.59 น.\n2.รางวัลในข้อ 3 จะได้รับทุกคน\n3 ผู้ได้รับรางวัลในข้อ 1 และ 2 จะต้องแจ้งอีเมลที่ใช้เล่นเกมกับแอดมินเพื่อใช้สำหรับการมอบของรางวัล\n4. ทีมงานสงวนสิทธิ์ในการแก้ไขเปลี่ยนแปลงรางวัลโดยไม่แจ้งให้ทราบล่วงหน้า\n5. รางวัลในทุกข้อไม่สามารถแลกเปลี่ยนเป็นเงินจริงได้"
             embed.add_field(name="รางวัล", value=rewards, inline=False)
             embed.add_field(name="เงื่อนไข", value=remark, inline=False)
             view=MyView(self.bot)
             message =await ctx.send("@everyone มาร่วมกิจกรรมกัน",embed =embed, view=view)
+            await ctx.send_response("โพสต์กิจกรรมแจกของรางวัลเรียบร้อยแล้ว", ephemeral=True)
             await message.add_reaction("🎉")
             await message.add_reaction("🎊")
             await message.add_reaction("🎁")
             await message.add_reaction("🎆")
-            await message.add_reaction("💰")
+            # await message.add_reaction("💰")
         else:
             await ctx.send_response("You don't have permission for this command.", ephemeral=True)
 
