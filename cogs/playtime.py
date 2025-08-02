@@ -23,19 +23,34 @@ class Playtime(commands.Cog):
                 user_id = str(after.id)
                 start_time = time.time()
                 user_ref = self.user.child(f"{user_id}")
-                user_ref.set({'start_time': start_time, 'total_time': user_ref.get().get('total_time', 0)})
+
+                # Initialize the user data if it's the first time they play
+                user_data = user_ref.get()
+                if user_data is None:
+                    user_ref.set({'start_time': start_time, 'total_time': 0})
+                else:
+                    user_ref.update({'start_time': start_time, 'total_time': user_data.get('total_time', 0)})
+
                 self.console.log(f"{after.display_name} started playing Star Citizen!")
-            elif before.activity and before.activity.name == "Star Citizen" and (not after.activity or after.activity.name != "Star Citizen"):
-                # record the stop time and calculate the play time
-                user_id = str(before.id)
-                user_ref = self.user.child(f"{user_id}")
-                if 'start_time' in user_ref.get():
-                    start_time = user_ref.get()['start_time']
-                    play_time = time.time() - start_time
-                    total_time = user_ref.get()['total_time'] + play_time
-                    user_ref.update({'total_time': total_time})
-                    user_ref.update({'start_time': None})
-                    self.console.log(f"{before.display_name} stopped playing Star Citizen. Total time played: {play_time / 3600:.2f} hours.")
+
+        elif before.activity and before.activity.name == "Star Citizen" and (not after.activity or after.activity.name != "Star Citizen"):
+            # record the stop time and calculate the play time
+            user_id = str(before.id)
+            user_ref = self.user.child(f"{user_id}")
+
+            # Get user data from Firebase
+            user_data = user_ref.get()
+
+            if user_data and 'start_time' in user_data:
+                start_time = user_data['start_time']
+                play_time = time.time() - start_time
+                total_time = user_data.get('total_time', 0) + play_time
+
+                # Update total_time and clear start_time
+                user_ref.update({'total_time': total_time, 'start_time': None})
+                self.console.log(f"{before.display_name} stopped playing Star Citizen. Total time played: {play_time / 3600:.2f} hours.")
+            else:
+                self.console.log(f"{before.display_name} stopped playing Star Citizen, but no start_time found.")
 
     @discord.slash_command(name='leaderboard', description='Show the leaderboard for Star Citizen playtime.')
     async def leaderboard(self, ctx):
