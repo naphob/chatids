@@ -90,9 +90,9 @@ class MyView(discord.ui.View):
         reward_pool = self.load_reward_pool()
 
         reward_chances = {
-            'coin': 96,
-            'gift_card': 3,
-            'miner_pack': 1
+            'coin': 70,
+            'gift_card': 25,
+            'miner_pack': 5
         }
 
         # ตรวจสอบว่ามีรางวัลเหลืออยู่หรือไม่
