@@ -54,10 +54,23 @@ class Voices(commands.Cog):
     async def tts_vc(self, ctx, user, message, err_msg):
         if user.voice is not None:
             q.put(message)
-            try:
-                vc = await user.voice.channel.connect()
-            except:
-                vc = ctx.voice_client
+            
+            vc = ctx.voice_client
+            if not vc:  # ถ้าบอทยังไม่ได้เชื่อมต่อห้องเสียง
+                try:
+                    vc = await user.voice.channel.connect()  # เชื่อมต่อห้องของผู้ใช้
+                    console.log(f"Bot connected to {user.voice.channel.name}")
+                    await asyncio.sleep(1)  # ให้เวลาให้บอทเชื่อมต่อห้องเสียง
+                except Exception as e:
+                    console.log(f"Error connecting to voice channel: {e}")
+                    await ctx.send_followup("ไม่สามารถเชื่อมต่อกับห้องเสียงได้", ephemeral=True)
+                    return
+            elif vc.channel != user.voice.channel:  # ถ้าบอทอยู่ในห้องอื่น
+                # ถ้าผู้ใช้ย้ายห้องหรือบอทอยู่ห้องอื่น
+                await vc.disconnect()  # ตัดการเชื่อมต่อจากห้องเดิม
+                vc = await user.voice.channel.connect()  # เชื่อมต่อห้องใหม่
+                await asyncio.sleep(1)  # รอให้การเชื่อมต่อเสร็จสมบูรณ์
+            
             while not q.empty():
                 if not vc.is_playing():
                     tts_message = q.get()
@@ -124,7 +137,7 @@ class Voices(commands.Cog):
             return
 
         await vc.disconnect()
-        await ctx.send_response("bot disconnected tfrom voice channel", ephemeral = True)
+        await ctx.send_response("bot disconnected from voice channel", ephemeral = True)
 
     @discord.slash_command(name="say", description="This command will make the bot speak what you want in the voice channel")
     async def say(self, ctx, words):
